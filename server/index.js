@@ -63,6 +63,33 @@ app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
 });
 
+// Temporary debug endpoint to verify serverless environment and views bundling
+app.get('/api/debug-env', (req, res) => {
+  const fs = require('fs');
+  const mongoose = require('mongoose');
+  let viewsExists = false;
+  let viewsContents = [];
+  try {
+    viewsExists = fs.existsSync(viewsPath);
+    if (viewsExists) {
+      viewsContents = fs.readdirSync(viewsPath);
+    }
+  } catch (e) {
+    viewsContents = [e.message];
+  }
+
+  res.json({
+    cwd: process.cwd(),
+    dirname: __dirname,
+    viewsPath,
+    viewsExists,
+    viewsContents,
+    mongoReadyState: mongoose.connection.readyState,
+    envNodeEnv: env.NODE_ENV,
+    hasMongoUri: !!process.env.MONGODB_URI
+  });
+});
+
 // Ensure database connection for serverless invocations (cached after cold start)
 app.use(async (req, res, next) => {
   try {

@@ -21,17 +21,23 @@ const globalErrorHandler = (err, req, res, next) => {
     });
   }
 
-  try {
-    res.status(statusCode).render('pages/error', {
-      title: `Error ${statusCode}`,
-      statusCode,
-      message: process.env.NODE_ENV === 'production'
-        ? 'An unexpected error occurred. Please try again later.'
-        : err.message
-    });
-  } catch (renderErr) {
-    res.status(statusCode).send(`Error ${statusCode}: ${err.message || 'Internal Server Error'}`);
-  }
+  res.render('pages/error', {
+    title: `Error ${statusCode}`,
+    statusCode,
+    message: err.message || 'An error occurred'
+  }, (renderErr, html) => {
+    if (renderErr) {
+      console.error('[Render Error in Error Handler]:', renderErr.message);
+      return res.status(statusCode).send(`
+        <div style="font-family:sans-serif;padding:30px;max-width:800px;margin:auto;">
+          <h2>Application Error (${statusCode})</h2>
+          <p><strong>Message:</strong> ${err.message}</p>
+          <pre style="background:#f4f4f4;padding:15px;border-radius:8px;overflow:auto;">${err.stack || ''}</pre>
+        </div>
+      `);
+    }
+    res.status(statusCode).send(html);
+  });
 };
 
 module.exports = {
