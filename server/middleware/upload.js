@@ -1,15 +1,32 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const os = require('os');
 
-const uploadsDir = path.join(__dirname, '../../public/uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// On serverless environments (like Vercel), the root file system (/var/task) is read-only.
+// Use os.tmpdir() for staging uploaded files.
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const uploadsDir = isServerless
+  ? path.join(os.tmpdir(), 'uploads')
+  : path.resolve(process.cwd(), 'public/uploads');
+
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (err) {
+  // Ignored if file system is read-only or already exists
 }
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir);
+    try {
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      cb(null, uploadsDir);
+    } catch (err) {
+      cb(null, os.tmpdir());
+    }
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
