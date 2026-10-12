@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
+    "build": "npm run build:css",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/css/tw.css --minify",
     "watch:css": "tailwindcss -i ./src/input.css -o ./public/css/tw.css --watch",
     "seed": "node server/seeds/seed.js"

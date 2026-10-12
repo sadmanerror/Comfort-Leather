@@ -4,9 +4,14 @@ const env = require('./env');
 let memServer = null;
 
 const connectDB = async () => {
+  // If already connected, return immediately (crucial for serverless environments like Vercel)
+  if (mongoose.connection.readyState >= 1) {
+    return mongoose.connection;
+  }
+
   try {
     const conn = await mongoose.connect(env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 3000
+      serverSelectionTimeoutMS: 5000
     });
     console.log(`[MongoDB] Connected successfully: ${conn.connection.host}/${conn.connection.name}`);
     return conn;
