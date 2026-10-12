@@ -90,6 +90,17 @@ app.get('/api/debug-env', (req, res) => {
   });
 });
 
+// Safe default template locals (ensures error pages and views never throw ReferenceError)
+app.use((req, res, next) => {
+  res.locals.currentPath = req.path || '/';
+  res.locals.formatBDT = formatBDT;
+  res.locals.currentUser = null;
+  res.locals.user = null;
+  res.locals.settings = {};
+  res.locals.megaMenu = [];
+  next();
+});
+
 // Ensure database connection for serverless invocations (cached after cold start)
 app.use(async (req, res, next) => {
   try {
