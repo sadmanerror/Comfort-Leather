@@ -22,7 +22,8 @@ const app = express();
 const expressLayouts = require('express-ejs-layouts');
 
 // View Engine & Layouts
-app.set('views', path.join(__dirname, '../views'));
+const viewsPath = path.resolve(process.cwd(), 'views');
+app.set('views', viewsPath);
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.set('layout', 'layouts/main');
@@ -52,13 +53,25 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files
-app.use(express.static(path.join(__dirname, '../public'), {
+const publicPath = path.resolve(process.cwd(), 'public');
+app.use(express.static(publicPath, {
   maxAge: env.NODE_ENV === 'production' ? '1d' : 0
 }));
 
 // Cheap keep-alive ping route (for Render/Fly free instances)
 app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
+});
+
+// Ensure database connection for serverless invocations (cached after cold start)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('[MongoDB] Request connection error:', err.message);
+    next(err);
+  }
 });
 
 // Global user authentication extraction & locals injector

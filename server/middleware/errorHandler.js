@@ -21,13 +21,17 @@ const globalErrorHandler = (err, req, res, next) => {
     });
   }
 
-  res.status(statusCode).render('pages/error', {
-    title: `Error ${statusCode}`,
-    statusCode,
-    message: process.env.NODE_ENV === 'production'
-      ? 'An unexpected error occurred. Please try again later.'
-      : err.message
-  });
+  try {
+    res.status(statusCode).render('pages/error', {
+      title: `Error ${statusCode}`,
+      statusCode,
+      message: process.env.NODE_ENV === 'production'
+        ? 'An unexpected error occurred. Please try again later.'
+        : err.message
+    });
+  } catch (renderErr) {
+    res.status(statusCode).send(`Error ${statusCode}: ${err.message || 'Internal Server Error'}`);
+  }
 };
 
 module.exports = {
