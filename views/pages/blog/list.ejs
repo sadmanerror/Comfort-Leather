@@ -1,0 +1,65 @@
+<div class="container py-4 py-lg-5">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb tw-text-sm tw-mb-0">
+      <li class="breadcrumb-item"><a href="/" class="tw-text-neutral-500 hover:tw-text-primary-600">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Stories & Shoe Care</li>
+    </ol>
+  </nav>
+
+  <!-- Hero Header -->
+  <div class="text-center tw-max-w-2xl mx-auto mb-5">
+    <h1 class="tw-font-display tw-font-extrabold tw-text-3xl lg:tw-text-4xl tw-text-neutral-900 mb-2">StepUp Journal & Style Guides</h1>
+    <p class="tw-text-neutral-500 tw-text-sm md:tw-text-base">
+      Master leather shoe care, explore monsoon footwear maintenance in Bangladesh, and stay ahead of seasonal trends.
+    </p>
+  </div>
+
+  <!-- Articles Grid -->
+  <% if (posts && posts.length > 0) { %>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <% posts.forEach(post => { %>
+        <div class="col">
+          <div class="card h-100 tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm overflow-hidden hover:tw-shadow-md tw-transition-all d-flex flex-column">
+            <a href="/blogs/stories/<%= post.slug %>" class="overflow-hidden">
+              <img src="<%= post.coverImage || '/img/placeholder-shoe.svg' %>" alt="<%= post.title %>" class="w-100 tw-aspect-video tw-object-cover hover:tw-scale-105 tw-transition-transform tw-duration-300">
+            </a>
+            <div class="card-body p-4 d-flex flex-column flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-light text-dark tw-text-2xs font-semibold px-2 py-1 tw-rounded-md">
+                  <%= post.category || 'Footwear Care' %>
+                </span>
+                <span class="tw-text-2xs tw-text-neutral-400">
+                  <%= new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-BD', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                </span>
+              </div>
+
+              <h2 class="tw-font-bold tw-text-base tw-text-neutral-900 mb-2 line-clamp-2">
+                <a href="/blogs/stories/<%= post.slug %>" class="tw-text-inherit tw-no-underline hover:tw-text-primary-600">
+                  <%= post.title %>
+                </a>
+              </h2>
+
+              <p class="tw-text-xs tw-text-neutral-500 mb-4 line-clamp-3">
+                <%= post.summary || post.excerpt %>
+              </p>
+
+              <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                <span class="tw-text-2xs tw-text-neutral-500">By <%= post.author || 'StepUp Editorial' %></span>
+                <a href="/blogs/stories/<%= post.slug %>" class="tw-text-xs tw-font-bold tw-text-primary-600 hover:tw-text-primary-700 tw-no-underline">
+                  Read Article <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5">
+      <i class="bi bi-journal-text tw-text-4xl text-neutral-300 d-block mb-2"></i>
+      <h3 class="tw-font-bold tw-text-base text-neutral-700">No articles published yet</h3>
+      <p class="tw-text-xs text-neutral-500">Check back soon for shoe maintenance guides and new arrival features.</p>
+    </div>
+  <% } %>
+</div>

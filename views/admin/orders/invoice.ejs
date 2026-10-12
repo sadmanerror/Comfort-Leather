@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice #<%= order.orderNo %> - Comfort Leather</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #222; background: #fff; }
+    .invoice-box { max-width: 800px; margin: auto; padding: 30px; }
+    @media print {
+      .no-print { display: none !important; }
+      .invoice-box { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-box">
+    <div class="no-print mb-3 text-end">
+      <button class="btn btn-primary btn-sm" onclick="window.print()">Print Invoice</button>
+    </div>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+      <div>
+        <h2 class="fw-bold m-0 text-danger">COMFORT LEATHER</h2>
+        <small class="text-muted"><%= settings.address || 'Dhaka, Bangladesh' %></small><br>
+        <small class="text-muted">Customer Care: <%= settings.contactPhone || '09666200300' %></small>
+      </div>
+      <div class="text-end">
+        <h3 class="fw-bold m-0">INVOICE</h3>
+        <p class="m-0 text-muted"><strong>#<%= order.orderNo %></strong></p>
+        <small class="text-muted">Date: <%= order.createdAt.toLocaleDateString('en-GB') %></small>
+      </div>
+    </div>
+
+    <!-- Bill To -->
+    <div class="row mb-4">
+      <div class="col-6">
+        <h6 class="fw-bold text-uppercase text-secondary" style="font-size: 11px;">Billed &amp; Shipped To:</h6>
+        <p class="m-0 fw-bold"><%= order.address.fullName %></p>
+        <p class="m-0 text-muted"><%= order.address.phone %></p>
+        <p class="m-0 text-muted"><%= order.address.addressDetails %></p>
+        <p class="m-0 text-muted"><%= order.address.area %>, <%= order.address.district %>, <%= order.address.division %></p>
+      </div>
+      <div class="col-6 text-end">
+        <h6 class="fw-bold text-uppercase text-secondary" style="font-size: 11px;">Payment Information:</h6>
+        <p class="m-0">Method: <strong><%= order.payment.method.toUpperCase() %></strong></p>
+        <p class="m-0">Status: <strong><%= order.payment.status.toUpperCase() %></strong></p>
+        <% if (order.payment.trxId) { %>
+          <p class="m-0 text-muted">Trx ID: <%= order.payment.trxId %></p>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <table class="table table-bordered mb-4">
+      <thead class="table-light">
+        <tr>
+          <th>Item Description</th>
+          <th>Variant (Color / Size)</th>
+          <th class="text-center">Qty</th>
+          <th class="text-end">Unit Price</th>
+          <th class="text-end">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% order.items.forEach(item => { %>
+          <tr>
+            <td><strong><%= item.name %></strong></td>
+            <td><%= item.color %> / Size <%= item.size %></td>
+            <td class="text-center"><%= item.qty %></td>
+            <td class="text-end"><%= formatBDT(item.price) %></td>
+            <td class="text-end"><%= formatBDT(item.price * item.qty) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" class="text-end fw-bold">Subtotal:</td>
+          <td class="text-end"><%= formatBDT(order.subtotal) %></td>
+        </tr>
+        <% if (order.discount > 0) { %>
+          <tr>
+            <td colspan="4" class="text-end fw-bold text-success">Discount:</td>
+            <td class="text-end text-success">-<%= formatBDT(order.discount) %></td>
+          </tr>
+        <% } %>
+        <tr>
+          <td colspan="4" class="text-end fw-bold">Shipping:</td>
+          <td class="text-end"><%= formatBDT(order.shipping) %></td>
+        </tr>
+        <tr class="table-light fs-5 fw-bold">
+          <td colspan="4" class="text-end text-danger">Total:</td>
+          <td class="text-end text-danger"><%= formatBDT(order.total) %></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="border-top pt-3 text-center text-muted small">
+      <p class="m-0">Thank you for shopping with Comfort Leather Bangladesh! For warranty or size exchanges within 7 days, please contact our support.</p>
+    </div>
+  </div>
+</body>
+</html>

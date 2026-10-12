@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <rect width="600" height="600" fill="#F8F9FA"/>
+  <g transform="translate(150, 200)" fill="none" stroke="#D1D5DB" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Sneaker / Shoe Outline -->
+    <path d="M20 180 C40 180, 80 190, 140 190 C220 190, 260 170, 290 120 C270 90, 240 80, 210 100 C170 80, 130 50, 110 30 C80 30, 60 70, 50 110 C30 130, 20 150, 20 180 Z" fill="#E5E7EB"/>
+    <path d="M10 190 C80 195, 200 195, 290 135 L290 155 C200 215, 80 215, 10 205 Z" fill="#D6001C" stroke="#B30017"/>
+    <circle cx="120" cy="90" r="4" fill="#9CA3AF"/>
+    <circle cx="140" cy="105" r="4" fill="#9CA3AF"/>
+    <circle cx="160" cy="120" r="4" fill="#9CA3AF"/>
+  </g>
+  <text x="300" y="440" font-family="'Poppins', sans-serif" font-weight="600" font-size="20" fill="#9CA3AF" text-anchor="middle">
+    STEPUP FOOTWEAR
+  </text>
+</svg>

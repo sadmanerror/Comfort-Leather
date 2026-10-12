@@ -1,0 +1,306 @@
+<!-- Products Management List View -->
+<div class="container-fluid p-0">
+  <!-- Page Header -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Products Catalog</h3>
+      <p class="text-muted small m-0">Total <%= total %> footwear and accessory products</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/admin/products/export" class="btn btn-outline-secondary btn-sm px-3">
+        <i class="fa-solid fa-file-csv me-1"></i> Export CSV
+      </a>
+      <a href="/admin/products/new" class="btn btn-danger btn-sm px-3 fw-medium">
+        <i class="fa-solid fa-plus me-1"></i> Add New Product
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter & Search Toolbar Card -->
+  <div class="card border-0 shadow-sm rounded-3 p-3 bg-white mb-3">
+    <form action="/admin/products" method="GET" class="row g-2 align-items-center">
+      <div class="col-12 col-md-4">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, SKU or tag..." value="<%= query.search || '' %>">
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <select name="gender" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">All Genders</option>
+          <option value="Men" <%= query.gender === 'Men' ? 'selected' : '' %>>Men</option>
+          <option value="Women" <%= query.gender === 'Women' ? 'selected' : '' %>>Women</option>
+          <option value="Boys" <%= query.gender === 'Boys' ? 'selected' : '' %>>Boys</option>
+          <option value="Girls" <%= query.gender === 'Girls' ? 'selected' : '' %>>Girls</option>
+          <option value="Unisex" <%= query.gender === 'Unisex' ? 'selected' : '' %>>Unisex</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select name="brand" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">All Brands</option>
+          <% brands.forEach(b => { %>
+            <option value="<%= b._id %>" <%= query.brand == b._id.toString() ? 'selected' : '' %>><%= b.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">All Statuses</option>
+          <option value="Published" <%= query.status === 'Published' ? 'selected' : '' %>>Published</option>
+          <option value="Draft" <%= query.status === 'Draft' ? 'selected' : '' %>>Draft</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-sm btn-dark w-100">Filter</button>
+        <% if (Object.keys(query).length > 0) { %>
+          <a href="/admin/products" class="btn btn-sm btn-light border"><i class="fa-solid fa-xmark"></i></a>
+        <% } %>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bulk Action Bar (Hidden by default, shown when items selected) -->
+  <form id="bulkForm" action="/admin/products/bulk" method="POST">
+    <div id="bulkActionBar" class="card border-0 shadow-sm rounded-3 p-2 px-3 bg-dark text-white mb-3 d-none align-items-center justify-content-between flex-row">
+      <div class="d-flex align-items-center gap-2 small">
+        <span id="selectedCount" class="badge bg-danger">0</span> selected
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <input type="hidden" name="ids" id="bulkIdsInput">
+        <select name="action" class="form-select form-select-sm text-bg-dark border-secondary" style="width: auto;" required>
+          <option value="">Choose Bulk Action...</option>
+          <option value="publish">Mark as Published</option>
+          <option value="unpublish">Mark as Draft</option>
+          <option value="delete">Delete Selected</option>
+        </select>
+        <button type="submit" class="btn btn-sm btn-danger px-3">Apply</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Products Table Card -->
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3" style="width: 40px;">
+              <input type="checkbox" class="form-check-input" id="selectAllCheckbox">
+            </th>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Brand</th>
+            <th>Regular Price</th>
+            <th>Sale Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Badges</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (products && products.length) { %>
+            <% products.forEach(p => { %>
+              <tr>
+                <td class="ps-3">
+                  <input type="checkbox" class="form-check-input item-checkbox" value="<%= p._id %>">
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <img src="<%= p.primaryImage %>" width="44" height="44" class="rounded border object-fit-cover flex-shrink-0" alt="<%= p.name %>">
+                    <div>
+                      <a href="/admin/products/<%= p._id %>/edit" class="fw-semibold text-dark text-decoration-none d-block text-truncate" style="max-width: 240px;">
+                        <%= p.name %>
+                      </a>
+                      <small class="text-muted"><%= p.gender %> &bull; <%= p.category ? p.category.name : '' %></small>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-muted"><%= p.colors?.[0]?.sizes?.[0]?.sku || p.slug %></td>
+                <td><span class="badge bg-light text-dark border"><%= p.brand ? p.brand.name : 'N/A' %></span></td>
+                <td class="fw-semibold"><%= formatBDT(p.price) %></td>
+                <td>
+                  <% if (p.salePrice) { %>
+                    <span class="text-danger fw-bold"><%= formatBDT(p.salePrice) %></span>
+                    <small class="text-muted">(-<%= p.discountPercent %>%)</small>
+                  <% } else { %>
+                    <span class="text-muted">&mdash;</span>
+                  <% } %>
+                </td>
+                <td>
+                  <span class="badge <%= p.totalStock > 5 ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger' %> border">
+                    <%= p.totalStock %> in stock
+                  </span>
+                </td>
+                <td>
+                  <span class="badge <%= p.status === 'Published' ? 'bg-success' : 'bg-secondary' %>">
+                    <%= p.status %>
+                  </span>
+                </td>
+                <td>
+                  <% if (p.flags.bestSeller) { %><span class="badge bg-warning text-dark me-1" title="Best Seller">Best Seller</span><% } %>
+                  <% if (p.flags.justLanded) { %><span class="badge bg-info text-dark me-1" title="Just Landed">New</span><% } %>
+                  <% if (p.flags.featured) { %><span class="badge bg-primary me-1" title="Featured">Featured</span><% } %>
+                </td>
+                <td class="text-end pe-3">
+                  <div class="btn-group btn-group-sm">
+                    <!-- Quick Inline Edit Modal Trigger -->
+                    <button type="button" class="btn btn-outline-secondary" onclick="openQuickEditModal('<%= p._id %>', '<%= p.name.replace(/'/g, '\\\'') %>', <%= p.price %>, <%= p.salePrice || 0 %>, '<%= p.status %>', <%= p.totalStock %>)" title="Quick Edit">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <!-- Duplicate -->
+                    <form action="/admin/products/<%= p._id %>/duplicate" method="POST" class="d-inline" onsubmit="return confirm('Duplicate this product as a draft?')">
+                      <button type="submit" class="btn btn-outline-secondary" title="Duplicate">
+                        <i class="fa-solid fa-copy"></i>
+                      </button>
+                    </form>
+                    <!-- Full Edit -->
+                    <a href="/admin/products/<%= p._id %>/edit" class="btn btn-outline-dark" title="Full Edit">
+                      <i class="fa-solid fa-sliders"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="10" class="text-center py-5 text-muted">
+                <i class="fa-solid fa-box-open fs-2 mb-2 d-block"></i>
+                No products found matching your search criteria.
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <% if (pages > 1) { %>
+      <div class="p-3 border-top d-flex align-items-center justify-content-between">
+        <small class="text-muted">Showing page <%= page %> of <%= pages %></small>
+        <ul class="pagination pagination-sm m-0">
+          <% for (let i = 1; i <= pages; i++) { %>
+            <li class="page-item <%= page === i ? 'active' : '' %>">
+              <a class="page-link" href="/admin/products?page=<%= i %>&search=<%= query.search || '' %>&brand=<%= query.brand || '' %>&status=<%= query.status || '' %>"><%= i %></a>
+            </li>
+          <% } %>
+        </ul>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Quick Edit Modal -->
+<div class="modal fade" id="quickEditModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="quickEditTitle">Quick Edit Product</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="quickEditForm">
+        <div class="modal-body">
+          <input type="hidden" id="quickEditId">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Regular Price (Tk)</label>
+            <input type="number" id="quickEditPrice" class="form-control" required min="0">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Sale Price (Tk - Optional)</label>
+            <input type="number" id="quickEditSalePrice" class="form-control" min="0">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Adjust Primary Stock</label>
+            <input type="number" id="quickEditStock" class="form-control" min="0">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Status</label>
+            <select id="quickEditStatus" class="form-select">
+              <option value="Published">Published</option>
+              <option value="Draft">Draft</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Update Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Bulk selection handling
+  const selectAll = document.getElementById('selectAllCheckbox');
+  const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+  const bulkActionBar = document.getElementById('bulkActionBar');
+  const selectedCount = document.getElementById('selectedCount');
+  const bulkIdsInput = document.getElementById('bulkIdsInput');
+
+  function updateBulkState() {
+    const checked = Array.from(itemCheckboxes).filter(cb => cb.checked);
+    if (checked.length > 0) {
+      bulkActionBar.classList.remove('d-none');
+      bulkActionBar.classList.add('d-flex');
+      selectedCount.innerText = checked.length;
+      bulkIdsInput.value = checked.map(cb => cb.value).join(',');
+    } else {
+      bulkActionBar.classList.add('d-none');
+      bulkActionBar.classList.remove('d-flex');
+      bulkIdsInput.value = '';
+    }
+  }
+
+  if (selectAll) {
+    selectAll.addEventListener('change', () => {
+      itemCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateBulkState();
+    });
+  }
+
+  itemCheckboxes.forEach(cb => {
+    cb.addEventListener('change', updateBulkState);
+  });
+
+  // Quick edit modal
+  let quickEditModalInstance = null;
+  function openQuickEditModal(id, name, price, salePrice, status, stock) {
+    document.getElementById('quickEditId').value = id;
+    document.getElementById('quickEditTitle').innerText = 'Quick Edit: ' + name;
+    document.getElementById('quickEditPrice').value = price;
+    document.getElementById('quickEditSalePrice').value = salePrice || '';
+    document.getElementById('quickEditStatus').value = status;
+    document.getElementById('quickEditStock').value = stock;
+
+    if (!quickEditModalInstance) {
+      quickEditModalInstance = new bootstrap.Modal(document.getElementById('quickEditModal'));
+    }
+    quickEditModalInstance.show();
+  }
+
+  document.getElementById('quickEditForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('quickEditId').value;
+    const price = document.getElementById('quickEditPrice').value;
+    const salePrice = document.getElementById('quickEditSalePrice').value;
+    const status = document.getElementById('quickEditStatus').value;
+    const stock = document.getElementById('quickEditStock').value;
+
+    try {
+      const res = await fetch(`/admin/products/${id}/quick-edit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ price, salePrice, status, stock })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert(data.message || 'Update failed');
+      }
+    } catch (err) {
+      alert('Error updating product');
+    }
+  });
+</script>

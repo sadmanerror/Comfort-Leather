@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Comfort Leather Bangladesh | Official Online Store' %></title>
+  
+  <!-- SEO & Social Meta Tags -->
+  <meta name="description" content="Shop authentic leather formal shoes, sneakers, sandals, flats, heels, and genuine leather bags at Comfort Leather Bangladesh. Nationwide cash on delivery and fast shipping.">
+  <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'Comfort Leather Bangladesh' %>">
+  <meta property="og:description" content="Premium footwear and authentic leather craftsmanship in Bangladesh.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/img/logo.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+
+  <!-- Google Fonts: Poppins & Montserrat with font-display: swap -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Bundled Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+  <!-- Tailwind CSS (tw- prefixed, no preflight clash) -->
+  <link rel="stylesheet" href="/css/tw.css">
+
+  <!-- Optional injected view styles -->
+  <%- typeof style !== 'undefined' ? style : '' %>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- 4.1 Top Utility Bar -->
+  <%- include('../partials/topbar') %>
+
+  <!-- 4.2 Sticky Header & Mega-Menu -->
+  <%- include('../partials/header') %>
+
+  <!-- 4.3 Search Overlay -->
+  <%- include('../partials/search-overlay') %>
+
+  <!-- Cart Drawer (Offcanvas) -->
+  <%- include('../partials/cart-drawer') %>
+
+  <!-- Global Modals (Quick View, Size Chart, Login) -->
+  <%- include('../partials/modals') %>
+
+  <!-- Main View Content -->
+  <main class="flex-grow-1">
+    <%- body %>
+  </main>
+
+  <!-- 13. Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Floating WhatsApp Chat Button (Section 4.2) -->
+  <% const waNumber = (settings && settings.whatsappNumber) || '8801700000000'; %>
+  <a href="https://wa.me/<%= waNumber %>?text=Hello%20Comfort%20Leather,%20I%20have%20an%20inquiry%20regarding%20an%20order" 
+     target="_blank" class="floating-whatsapp text-decoration-none" title="Chat on WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
+
+  <!-- Floating Back to Top Button (Section 4.2) -->
+  <button type="button" class="back-to-top-btn border-0" id="backToTopBtn" title="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- Local Bundled Bootstrap 5 JS Bundle -->
+  <script src="/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Global Client-Side Shopping Cart & Wishlist Script -->
+  <script>
+    // 1. Back to Top Button
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
+    });
+    if (backToTopBtn) {
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // 2. Shopping Cart Management (localStorage)
+    const CART_KEY = 'stepup_cart_v1';
+    function getLocalCart() {
+      try {
+        return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveLocalCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      updateCartUI();
+    }
+
+    function addToCart({ productId, name, image, price, color, size, qty = 1 }) {
+      const cart = getLocalCart();
+      const existing = cart.find(i => i.productId === productId && i.color === color && i.size === size);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ productId, name, image, price, color, size, qty });
+      }
+      saveLocalCart(cart);
+
+      // Open drawer automatically
+      const drawerEl = document.getElementById('cartDrawer');
+      const bsDrawer = bootstrap.Offcanvas.getOrCreateInstance(drawerEl);
+      bsDrawer.show();
+    }
+
+    function updateCartItemQty(index, newQty) {
+      const cart = getLocalCart();
+      if (newQty <= 0) {
+        cart.splice(index, 1);
+      } else {
+        cart[index].qty = newQty;
+      }
+      saveLocalCart(cart);
+    }
+
+    function removeCartItem(index) {
+      const cart = getLocalCart();
+      cart.splice(index, 1);
+      saveLocalCart(cart);
+    }
+
+    function formatBDTClient(num) {
+      return 'Tk ' + Number(num || 0).toLocaleString('en-BD', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function updateCartUI() {
+      const cart = getLocalCart();
+      const count = cart.reduce((sum, i) => sum + i.qty, 0);
+      const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+      // Header & Drawer count badges
+      const headerCountEl = document.getElementById('headerCartCount');
+      const drawerCountEl = document.getElementById('cartDrawerCount');
+      if (headerCountEl) headerCountEl.innerText = count;
+      if (drawerCountEl) drawerCountEl.innerText = count;
+
+      // Drawer items container
+      const itemsContainer = document.getElementById('cartDrawerItems');
+      const emptyContainer = document.getElementById('cartDrawerEmpty');
+      const footerContainer = document.getElementById('cartDrawerFooter');
+      const subtotalEl = document.getElementById('cartDrawerSubtotal');
+
+      if (!itemsContainer) return;
+
+      if (cart.length === 0) {
+        itemsContainer.innerHTML = '';
+        emptyContainer.style.display = 'block';
+        footerContainer.style.display = 'none';
+      } else {
+        emptyContainer.style.display = 'none';
+        footerContainer.style.display = 'block';
+        subtotalEl.innerText = formatBDTClient(subtotal);
+
+        itemsContainer.innerHTML = cart.map((item, idx) => `
+          <div class="d-flex gap-3 py-3 border-bottom position-relative align-items-center">
+            <img src="${item.image || '/img/placeholder-shoe.svg'}" width="65" height="65" class="rounded border object-fit-cover flex-shrink-0" alt="${item.name}">
+            <div class="flex-grow-1 overflow-hidden">
+              <h6 class="fw-semibold text-dark mb-1 text-truncate" style="font-size: 13.5px;">${item.name}</h6>
+              <div class="small text-muted mb-2" style="font-size: 11px;">
+                ${item.color} &bull; Size ${item.size}
+              </div>
+              <div class="d-flex align-items-center justify-content-between">
+                <!-- Qty Stepper -->
+                <div class="input-group input-group-sm" style="width: 85px;">
+                  <button class="btn btn-outline-secondary py-0 px-2" onclick="updateCartItemQty(${idx}, ${item.qty - 1})">-</button>
+                  <span class="input-group-text bg-white px-2 py-0 border-start-0 border-end-0 small text-center" style="width: 28px;">${item.qty}</span>
+                  <button class="btn btn-outline-secondary py-0 px-2" onclick="updateCartItemQty(${idx}, ${item.qty + 1})">+</button>
+                </div>
+                <div class="fw-bold text-dark small">${formatBDTClient(item.price * item.qty)}</div>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-link text-muted p-0 ms-1" onclick="removeCartItem(${idx})" title="Remove item">
+              <i class="fa-solid fa-trash-can" style="font-size: 13px;"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 3. Wishlist Management (Guest localStorage + Logged-in sync)
+    const WISHLIST_KEY = 'stepup_wishlist_v1';
+    function getLocalWishlist() {
+      try {
+        return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function toggleWishlistClient(productId, btnEl) {
+      let wl = getLocalWishlist();
+      const idx = wl.indexOf(productId);
+      let isAdded = false;
+
+      if (idx > -1) {
+        wl.splice(idx, 1);
+        isAdded = false;
+      } else {
+        wl.push(productId);
+        isAdded = true;
+      }
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(wl));
+
+      // Visual heart icon toggle
+      if (btnEl) {
+        const icon = btnEl.querySelector('i');
+        if (icon) {
+          if (isAdded) {
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+          } else {
+            icon.classList.remove('fa-solid');
+            icon.classList.add('fa-regular');
+          }
+        }
+      }
+
+      // Backend sync via AJAX
+      fetch('/api/wishlist/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      }).catch(() => {});
+
+      updateWishlistUI();
+    }
+
+    function updateWishlistUI() {
+      const wl = getLocalWishlist();
+      const badge = document.getElementById('headerWishlistBadge');
+      if (badge) {
+        if (wl.length > 0) {
+          badge.style.display = 'inline-block';
+          badge.innerText = wl.length;
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      // Sync active heart icons on page
+      document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        const pid = btn.dataset.productId;
+        const icon = btn.querySelector('i');
+        if (icon && wl.includes(pid)) {
+          icon.classList.remove('fa-regular');
+          icon.classList.add('fa-solid');
+        }
+      });
+    }
+
+    // 4. Quick View Modal Handler
+    let qvModalInstance = null;
+    let currentQvProduct = null;
+    let selectedQvColor = null;
+    let selectedQvSize = null;
+
+    async function openQuickView(productId) {
+      try {
+        const res = await fetch(`/api/products/${productId}/quick-view`);
+        const data = await res.json();
+        if (!data.success) return;
+
+        currentQvProduct = data.product;
+        selectedQvColor = currentQvProduct.colors[0];
+        selectedQvSize = selectedQvColor.sizes.find(s => s.stock > 0) || selectedQvColor.sizes[0];
+
+        document.getElementById('qvTitle').innerText = currentQvProduct.name;
+        document.getElementById('qvBrand').innerText = currentQvProduct.brandName;
+        document.getElementById('qvDesc').innerText = currentQvProduct.shortDesc || '';
+        document.getElementById('qvPrice').innerText = currentQvProduct.salePriceFormatted || currentQvProduct.priceFormatted;
+        document.getElementById('qvOldPrice').innerText = currentQvProduct.salePriceFormatted ? currentQvProduct.priceFormatted : '';
+        document.getElementById('qvImage').src = currentQvProduct.primaryImage;
+        document.getElementById('qvFullDetailsBtn').href = `/products/${currentQvProduct.slug}`;
+
+        // Colors
+        const colorsDiv = document.getElementById('qvColors');
+        colorsDiv.innerHTML = currentQvProduct.colors.map((c, i) => `
+          <button type="button" class="btn btn-sm btn-light border rounded-pill d-flex align-items-center gap-1 ${i === 0 ? 'border-danger fw-bold' : ''}" 
+            onclick="selectQvColor(${i}, this)">
+            <span class="rounded-circle d-inline-block" style="width: 12px; height: 12px; background: ${c.hex};"></span>
+            ${c.name}
+          </button>
+        `).join('');
+
+        renderQvSizes();
+
+        if (!qvModalInstance) {
+          qvModalInstance = new bootstrap.Modal(document.getElementById('quickViewModal'));
+        }
+        qvModalInstance.show();
+      } catch (err) {
+        console.error('Quick view error', err);
+      }
+    }
+
+    function selectQvColor(colorIdx, btn) {
+      selectedQvColor = currentQvProduct.colors[colorIdx];
+      document.querySelectorAll('#qvColors button').forEach(b => b.classList.remove('border-danger', 'fw-bold'));
+      btn.classList.add('border-danger', 'fw-bold');
+      if (selectedQvColor.images && selectedQvColor.images.length) {
+        document.getElementById('qvImage').src = selectedQvColor.images[0].url;
+      }
+      renderQvSizes();
+    }
+
+    function renderQvSizes() {
+      const sizesDiv = document.getElementById('qvSizes');
+      sizesDiv.innerHTML = selectedQvColor.sizes.map((s, i) => `
+        <button type="button" class="btn btn-sm border ${s.stock <= 0 ? 'disabled opacity-50 text-decoration-line-through' : ''} ${selectedQvSize && selectedQvSize.size === s.size ? 'btn-danger' : 'btn-light'}" 
+          onclick="selectQvSize('${s.size}')" ${s.stock <= 0 ? 'disabled' : ''}>
+          ${s.size}
+        </button>
+      `).join('');
+    }
+
+    function selectQvSize(sz) {
+      selectedQvSize = selectedQvColor.sizes.find(s => s.size === sz);
+      renderQvSizes();
+    }
+
+    document.getElementById('qvAddToCartBtn').addEventListener('click', () => {
+      if (!selectedQvSize) {
+        alert('Please choose an available size.');
+        return;
+      }
+      addToCart({
+        productId: currentQvProduct._id,
+        name: currentQvProduct.name,
+        image: selectedQvColor.images?.[0]?.url || currentQvProduct.primaryImage,
+        price: currentQvProduct.salePrice || currentQvProduct.price,
+        color: selectedQvColor.name,
+        size: selectedQvSize.size,
+        qty: 1
+      });
+      if (qvModalInstance) qvModalInstance.hide();
+    });
+
+    // Initialize UI on DOM Ready
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartUI();
+      updateWishlistUI();
+
+      // Wishlist button click delegation
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.wishlist-btn');
+        if (btn) {
+          e.preventDefault();
+          toggleWishlistClient(btn.dataset.productId, btn);
+        }
+
+        const quickAddBtn = e.target.closest('.add-to-cart-quick');
+        if (quickAddBtn) {
+          e.preventDefault();
+          const card = quickAddBtn.closest('.product-card');
+          const title = card.querySelector('.card-title a').innerText;
+          const img = card.querySelector('.primary-img').src;
+          const priceText = card.querySelector('.fs-6').innerText.replace(/[^\d.]/g, '');
+          addToCart({
+            productId: quickAddBtn.dataset.productId,
+            name: title,
+            image: img,
+            price: parseFloat(priceText),
+            color: quickAddBtn.dataset.color || 'Standard',
+            size: quickAddBtn.dataset.size || 'One Size',
+            qty: 1
+          });
+        }
+      });
+    });
+  </script>
+
+  <!-- Optional injected view scripts -->
+  <%- typeof script !== 'undefined' ? script : '' %>
+</body>
+</html>

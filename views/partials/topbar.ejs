@@ -1,0 +1,29 @@
+<!-- Top Utility Bar (Section 4.1) -->
+<div class="bg-dark text-white py-1 px-3 border-bottom border-dark-subtle" style="font-size: 12px;">
+  <div class="container d-flex flex-wrap align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-3">
+      <a href="<%= (settings && settings.storeLocatorLink) || '/stores' %>" class="text-white text-decoration-none hover-underline d-flex align-items-center gap-1">
+        <i class="fa-solid fa-location-dot text-danger"></i> Find A Store
+      </a>
+      <span class="text-secondary opacity-50">|</span>
+      <span class="d-none d-sm-inline">
+        Customer Care: <strong><%= (settings && settings.contactPhone) || '09666200300' %></strong>
+      </span>
+    </div>
+
+    <!-- Announcement Text -->
+    <% if (settings && settings.announcementBarActive && settings.announcementBarText) { %>
+      <div class="d-none d-md-block text-warning text-truncate fw-medium" style="max-width: 550px;">
+        <i class="fa-solid fa-bullhorn me-1"></i> <%= settings.announcementBarText %>
+      </div>
+    <% } %>
+
+    <div class="d-flex align-items-center gap-3">
+      <a href="/track-order" class="text-white text-decoration-none hover-underline">
+        <i class="fa-solid fa-truck-fast text-secondary me-1"></i> Track Order
+      </a>
+      <span class="text-secondary opacity-50">|</span>
+      <span class="badge bg-danger text-uppercase fw-semibold" style="font-size: 9px; letter-spacing: 0.5px;">BDT (Tk)</span>
+    </div>
+  </div>
+</div>

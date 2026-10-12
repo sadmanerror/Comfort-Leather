@@ -1,0 +1,450 @@
+<div class="container py-4 py-lg-5">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb tw-text-sm tw-mb-0">
+      <li class="breadcrumb-item"><a href="/" class="tw-text-neutral-500 hover:tw-text-primary-600">Home</a></li>
+      <li class="breadcrumb-item"><a href="/cart" class="tw-text-neutral-500 hover:tw-text-primary-600">Cart</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+    </ol>
+  </nav>
+
+  <h1 class="tw-font-display tw-font-bold tw-text-2xl lg:tw-text-3xl tw-text-neutral-900 tw-mb-6">Secure Checkout</h1>
+
+  <!-- Checkout Grid -->
+  <form id="checkoutForm" onsubmit="handleCheckoutSubmit(event)">
+    <div class="row g-4 lg:g-5">
+      <!-- Left Column: Shipping & Payment -->
+      <div class="col-lg-7">
+        <!-- 1. Customer Information -->
+        <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-4 p-md-5 mb-4">
+          <div class="d-flex align-items-center gap-3 mb-4 pb-3 tw-border-b tw-border-neutral-100">
+            <div class="tw-w-8 tw-h-8 tw-rounded-full tw-bg-primary-600 tw-text-white d-flex align-items-center justify-content-center tw-font-bold tw-text-sm">
+              1
+            </div>
+            <h2 class="tw-font-display tw-font-bold tw-text-lg tw-text-neutral-900 mb-0">Customer Contact</h2>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">FULL NAME <span class="text-danger">*</span></label>
+              <input type="text" name="fullName" class="form-control tw-rounded-xl" placeholder="e.g. Tanvir Ahmed" value="<%= user ? user.name : '' %>" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">MOBILE PHONE (11 DIGITS) <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light tw-text-sm tw-font-medium">+880</span>
+                <input type="tel" name="phone" id="checkoutPhone" class="form-control tw-rounded-r-xl" placeholder="1712345678" value="<%= user && user.phone ? user.phone.replace(/^\+?880?/, '') : '' %>" required pattern="[0-9]{10,11}">
+              </div>
+              <small class="tw-text-neutral-500 tw-text-xs">We will call or SMS this number for delivery confirmation.</small>
+            </div>
+            <div class="col-12">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">EMAIL ADDRESS (FOR RECEIPT)</label>
+              <input type="email" name="email" class="form-control tw-rounded-xl" placeholder="e.g. tanvir@example.com" value="<%= user ? user.email : '' %>">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Shipping Address -->
+        <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-4 p-md-5 mb-4">
+          <div class="d-flex align-items-center gap-3 mb-4 pb-3 tw-border-b tw-border-neutral-100">
+            <div class="tw-w-8 tw-h-8 tw-rounded-full tw-bg-primary-600 tw-text-white d-flex align-items-center justify-content-center tw-font-bold tw-text-sm">
+              2
+            </div>
+            <h2 class="tw-font-display tw-font-bold tw-text-lg tw-text-neutral-900 mb-0">Delivery Address in Bangladesh</h2>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">DIVISION <span class="text-danger">*</span></label>
+              <select name="division" id="checkoutDivision" class="form-select tw-rounded-xl" required onchange="handleDivisionChange()">
+                <option value="">Select Division</option>
+                <% divisions.forEach(div => { %>
+                  <option value="<%= div %>"><%= div %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">DISTRICT / CITY <span class="text-danger">*</span></label>
+              <select name="district" id="checkoutDistrict" class="form-select tw-rounded-xl" required onchange="handleDistrictChange()">
+                <option value="">Select Division First</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">THANA / AREA / POLICE STATION <span class="text-danger">*</span></label>
+              <input type="text" name="area" class="form-control tw-rounded-xl" placeholder="e.g. Dhanmondi / Uttara / Panchlaish" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">POSTAL CODE (OPTIONAL)</label>
+              <input type="text" name="postCode" class="form-control tw-rounded-xl" placeholder="e.g. 1205">
+            </div>
+            <div class="col-12">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">DETAILED STREET ADDRESS / HOUSE / ROAD <span class="text-danger">*</span></label>
+              <textarea name="addressDetails" class="form-control tw-rounded-xl" rows="2" placeholder="House 12, Road 4/A, Sector 9, Flat 3B" required></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">SPECIAL DELIVERY INSTRUCTIONS</label>
+              <input type="text" name="note" class="form-control tw-rounded-xl" placeholder="e.g. Leave with security guard, call before arriving">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Payment Method -->
+        <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-4 p-md-5 mb-4">
+          <div class="d-flex align-items-center gap-3 mb-4 pb-3 tw-border-b tw-border-neutral-100">
+            <div class="tw-w-8 tw-h-8 tw-rounded-full tw-bg-primary-600 tw-text-white d-flex align-items-center justify-content-center tw-font-bold tw-text-sm">
+              3
+            </div>
+            <h2 class="tw-font-display tw-font-bold tw-text-lg tw-text-neutral-900 mb-0">Payment Method</h2>
+          </div>
+
+          <div class="tw-space-y-3">
+            <!-- Option 1: Cash on Delivery -->
+            <label class="card tw-border-2 tw-border-primary-600 tw-rounded-2xl p-3 d-flex flex-row align-items-center gap-3 cursor-pointer" id="labelCod">
+              <input type="radio" name="paymentMethod" value="cod" class="form-check-input mt-0 flex-shrink-0" checked onchange="togglePaymentTab('cod')">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="tw-font-bold tw-text-neutral-900">Cash on Delivery (COD)</span>
+                  <span class="badge bg-success-subtle text-success">Most Popular</span>
+                </div>
+                <div class="tw-text-xs tw-text-neutral-500 mt-1">
+                  Pay with cash when your parcel is delivered right at your doorstep. Inspect your shoes before paying.
+                </div>
+              </div>
+            </label>
+
+            <!-- Option 2: bKash / Nagad Mobile Banking -->
+            <label class="card tw-border-2 tw-border-neutral-200 tw-rounded-2xl p-3 d-flex flex-row align-items-center gap-3 cursor-pointer" id="labelBkash">
+              <input type="radio" name="paymentMethod" value="bkash_nagad" class="form-check-input mt-0 flex-shrink-0" onchange="togglePaymentTab('bkash_nagad')">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="tw-font-bold tw-text-neutral-900">bKash / Nagad Send Money</span>
+                  <span class="tw-text-xs tw-font-semibold tw-text-pink-600">bKash / Nagad</span>
+                </div>
+                <div class="tw-text-xs tw-text-neutral-500 mt-1">
+                  Pay securely via your personal bKash or Nagad wallet. Faster processing.
+                </div>
+              </div>
+            </label>
+
+            <!-- bKash Details Box (Shown only if selected) -->
+            <div id="bkashPaymentDetails" class="d-none tw-bg-pink-50 tw-border tw-border-pink-200 tw-rounded-2xl p-4 mt-3">
+              <h4 class="tw-font-bold tw-text-sm tw-text-pink-900 mb-2">How to Pay via bKash / Nagad:</h4>
+              <ol class="tw-text-xs tw-text-pink-950 ps-3 mb-3 tw-space-y-1">
+                <li>Go to your bKash or Nagad App and select <strong>Send Money</strong>.</li>
+                <li>Send the total order amount to our Merchant / Helpline number: <strong>01712-345678</strong> (Personal).</li>
+                <li>Enter your Order Reference / Name as reference.</li>
+                <li>Copy the <strong>Transaction ID (TrxID)</strong> and paste it below.</li>
+              </ol>
+              <div class="mb-2">
+                <label class="form-label tw-text-xs tw-font-semibold tw-text-pink-900">TRANSACTION ID (TRXID) <span class="text-danger">*</span></label>
+                <input type="text" name="trxId" id="trxIdInput" class="form-control tw-rounded-xl text-uppercase" placeholder="e.g. 9J84KDLA92">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Sticky Order Summary & Submission -->
+      <div class="col-lg-5">
+        <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-4 sticky-top" style="top: 90px; z-index: 10;">
+          <h2 class="tw-font-display tw-font-bold tw-text-lg tw-text-neutral-900 tw-mb-4">Order Items</h2>
+
+          <!-- Mini Cart Items List -->
+          <div id="checkoutItemsList" class="tw-max-h-64 tw-overflow-y-auto tw-divide-y tw-divide-neutral-100 tw-pr-1 mb-4">
+            <!-- Rendered via JS -->
+          </div>
+
+          <!-- Promo Code -->
+          <div class="tw-mb-4 tw-pb-4 tw-border-b tw-border-neutral-200">
+            <label class="form-label tw-text-xs tw-font-medium tw-text-neutral-500">APPLY DISCOUNT CODE</label>
+            <div class="input-group input-group-sm">
+              <input type="text" id="checkoutCouponInput" class="form-control text-uppercase" placeholder="Coupon Code">
+              <button class="btn btn-dark" type="button" onclick="applyCheckoutCoupon()">Apply</button>
+            </div>
+            <div id="checkoutCouponMsg" class="tw-text-xs mt-1"></div>
+          </div>
+
+          <% if (user && user.points > 0) { %>
+            <!-- Loyalty Points Redemption -->
+            <div class="tw-bg-amber-50 tw-border tw-border-amber-200 tw-rounded-xl p-3 mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="tw-text-xs tw-font-bold tw-text-amber-900">Club StepUp Points</span>
+                <span class="badge bg-amber-500 text-white"><%= user.points %> pts available</span>
+              </div>
+              <p class="tw-text-xs tw-text-amber-800 mb-2">1 point = Tk 1 discount</p>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="usePointsToggle" onchange="toggleLoyaltyPoints()">
+                <label class="form-check-label tw-text-xs tw-font-semibold tw-text-amber-950" for="usePointsToggle">
+                  Redeem <%= user.points %> Points (-Tk <%= user.points %>)
+                </label>
+              </div>
+            </div>
+          <% } %>
+
+          <!-- Pricing Breakdown -->
+          <div class="tw-space-y-3 tw-text-sm tw-pb-4 tw-border-b tw-border-neutral-200">
+            <div class="d-flex justify-content-between tw-text-neutral-600">
+              <span>Subtotal</span>
+              <span class="tw-font-semibold tw-text-neutral-900" id="checkoutSubtotal">Tk 0.00</span>
+            </div>
+            <div class="d-flex justify-content-between tw-text-neutral-600">
+              <span>Delivery Fee</span>
+              <span class="tw-font-semibold tw-text-neutral-900" id="checkoutShipping">Tk 60.00</span>
+            </div>
+            <div class="d-flex justify-content-between tw-text-green-600 d-none" id="checkoutCouponRow">
+              <span>Coupon Discount (<span id="checkoutCouponCodeDisplay"></span>)</span>
+              <span class="tw-font-semibold" id="checkoutCouponAmount">-Tk 0.00</span>
+            </div>
+            <div class="d-flex justify-content-between tw-text-amber-700 d-none" id="checkoutPointsRow">
+              <span>Loyalty Points Discount</span>
+              <span class="tw-font-semibold" id="checkoutPointsAmount">-Tk 0.00</span>
+            </div>
+          </div>
+
+          <!-- Grand Total -->
+          <div class="d-flex justify-content-between align-items-baseline tw-py-4">
+            <span class="tw-font-bold tw-text-neutral-900 tw-text-lg">Grand Total</span>
+            <span class="tw-font-display tw-font-extrabold tw-text-2xl tw-text-primary-700" id="checkoutGrandTotal">Tk 0.00</span>
+          </div>
+
+          <!-- Alert / Error box -->
+          <div id="checkoutErrorAlert" class="alert alert-danger tw-text-xs d-none mb-3"></div>
+
+          <!-- Submit Order Button -->
+          <button type="submit" id="placeOrderBtn" class="btn btn-primary btn-lg w-100 tw-rounded-xl tw-font-bold tw-py-3 tw-shadow-md hover:tw-shadow-lg">
+            <span id="btnText">Confirm Order <i class="bi bi-arrow-right ms-2"></i></span>
+            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          </button>
+
+          <p class="tw-text-center tw-text-xs tw-text-neutral-400 mt-3 mb-0">
+            <i class="bi bi-shield-lock me-1"></i> 256-bit Encrypted & Safe Checkout
+          </p>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  const BD_GEOGRAPHY = <%- bdGeographyJson %>;
+  const SHIPPING_INSIDE_DHAKA = <%= (settings && settings.shippingInsideDhaka) || 60 %>;
+  const SHIPPING_OUTSIDE_DHAKA = <%= (settings && settings.shippingOutsideDhaka) || 120 %>;
+  const FREE_SHIPPING_THRESHOLD = <%= (settings && settings.freeShippingThreshold) || 3000 %>;
+  const USER_POINTS = <%= (user && user.points) ? user.points : 0 %>;
+
+  let currentCoupon = null;
+  let usePoints = false;
+
+  function initCheckoutView() {
+    const items = window.CartState ? window.CartState.items : [];
+    if (!items || items.length === 0) {
+      alert('Your cart is empty. Please add items to your cart before proceeding to checkout.');
+      window.location.href = '/collections/all';
+      return;
+    }
+
+    const container = document.getElementById('checkoutItemsList');
+    container.innerHTML = items.map(item => `
+      <div class="d-flex align-items-center gap-3 py-2">
+        <img src="${item.image || '/img/placeholder-shoe.svg'}" alt="${item.name}" class="tw-w-12 tw-h-12 tw-rounded-lg tw-object-cover tw-bg-neutral-100 flex-shrink-0">
+        <div class="flex-grow-1 tw-min-w-0">
+          <div class="tw-text-xs tw-font-semibold tw-text-neutral-900 tw-truncate">${item.name}</div>
+          <div class="tw-text-xs tw-text-neutral-500">Color: ${item.color} | Size: ${item.size} | Qty: ${item.qty}</div>
+        </div>
+        <div class="tw-text-xs tw-font-bold tw-text-neutral-900 flex-shrink-0">
+          Tk ${(item.price * item.qty).toLocaleString()}
+        </div>
+      </div>
+    `).join('');
+
+    recalculateCheckoutTotals();
+  }
+
+  function handleDivisionChange() {
+    const division = document.getElementById('checkoutDivision').value;
+    const districtSelect = document.getElementById('checkoutDistrict');
+    districtSelect.innerHTML = '<option value="">Select District</option>';
+
+    if (division && BD_GEOGRAPHY[division]) {
+      BD_GEOGRAPHY[division].forEach(dist => {
+        const opt = document.createElement('option');
+        opt.value = dist;
+        opt.textContent = dist;
+        districtSelect.appendChild(opt);
+      });
+    }
+
+    recalculateCheckoutTotals();
+  }
+
+  function handleDistrictChange() {
+    recalculateCheckoutTotals();
+  }
+
+  function recalculateCheckoutTotals() {
+    const items = window.CartState ? window.CartState.items : [];
+    const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+    const division = document.getElementById('checkoutDivision').value;
+    const district = document.getElementById('checkoutDistrict').value;
+
+    let shipping = SHIPPING_OUTSIDE_DHAKA;
+    if (division.toLowerCase() === 'dhaka' && district.toLowerCase().includes('dhaka')) {
+      shipping = SHIPPING_INSIDE_DHAKA;
+    }
+
+    if (FREE_SHIPPING_THRESHOLD && subtotal >= FREE_SHIPPING_THRESHOLD) {
+      shipping = 0;
+    }
+
+    let couponDiscount = 0;
+    if (currentCoupon) {
+      if (currentCoupon.discountType === 'percentage') {
+        couponDiscount = (subtotal * currentCoupon.discountValue) / 100;
+        if (currentCoupon.maxDiscountAmount && couponDiscount > currentCoupon.maxDiscountAmount) {
+          couponDiscount = currentCoupon.maxDiscountAmount;
+        }
+      } else {
+        couponDiscount = currentCoupon.discountValue;
+      }
+      document.getElementById('checkoutCouponRow').classList.remove('d-none');
+      document.getElementById('checkoutCouponCodeDisplay').textContent = currentCoupon.code;
+      document.getElementById('checkoutCouponAmount').textContent = `-Tk ${couponDiscount.toLocaleString()}`;
+    } else {
+      document.getElementById('checkoutCouponRow').classList.add('d-none');
+    }
+
+    let pointsDiscount = 0;
+    if (usePoints && USER_POINTS > 0) {
+      pointsDiscount = Math.min(USER_POINTS, Math.max(0, subtotal - couponDiscount));
+      document.getElementById('checkoutPointsRow').classList.remove('d-none');
+      document.getElementById('checkoutPointsAmount').textContent = `-Tk ${pointsDiscount.toLocaleString()}`;
+    } else {
+      document.getElementById('checkoutPointsRow').classList.add('d-none');
+    }
+
+    const grandTotal = Math.max(0, subtotal - couponDiscount - pointsDiscount + shipping);
+
+    document.getElementById('checkoutSubtotal').textContent = `Tk ${subtotal.toLocaleString()}`;
+    document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'FREE' : `Tk ${shipping.toLocaleString()}`;
+    document.getElementById('checkoutGrandTotal').textContent = `Tk ${grandTotal.toLocaleString()}`;
+  }
+
+  function togglePaymentTab(method) {
+    const codLabel = document.getElementById('labelCod');
+    const bkashLabel = document.getElementById('labelBkash');
+    const bkashDetails = document.getElementById('bkashPaymentDetails');
+
+    if (method === 'bkash_nagad') {
+      codLabel.className = 'card tw-border-2 tw-border-neutral-200 tw-rounded-2xl p-3 d-flex flex-row align-items-center gap-3 cursor-pointer';
+      bkashLabel.className = 'card tw-border-2 tw-border-pink-500 tw-rounded-2xl p-3 d-flex flex-row align-items-center gap-3 cursor-pointer';
+      bkashDetails.classList.remove('d-none');
+      document.getElementById('trxIdInput').required = true;
+    } else {
+      codLabel.className = 'card tw-border-2 tw-border-primary-600 tw-rounded-2xl p-3 d-flex flex-row align-items-center gap-3 cursor-pointer';
+      bkashLabel.className = 'card tw-border-2 tw-border-neutral-200 tw-rounded-2xl p-3 d-flex flex-row align-items-center gap-3 cursor-pointer';
+      bkashDetails.classList.add('d-none');
+      document.getElementById('trxIdInput').required = false;
+    }
+  }
+
+  async function applyCheckoutCoupon() {
+    const input = document.getElementById('checkoutCouponInput');
+    const msg = document.getElementById('checkoutCouponMsg');
+    const code = input.value.trim().toUpperCase();
+    if (!code) return;
+
+    const items = window.CartState ? window.CartState.items : [];
+    const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+    try {
+      const res = await fetch('/api/cart/coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal })
+      });
+      const data = await res.json();
+      if (data.valid) {
+        currentCoupon = data.coupon;
+        msg.className = 'tw-text-xs mt-1 tw-text-green-600';
+        msg.textContent = `Promo code "${data.coupon.code}" applied!`;
+        recalculateCheckoutTotals();
+      } else {
+        currentCoupon = null;
+        msg.className = 'tw-text-xs mt-1 tw-text-red-500';
+        msg.textContent = data.message || 'Invalid coupon code';
+        recalculateCheckoutTotals();
+      }
+    } catch (err) {
+      msg.className = 'tw-text-xs mt-1 tw-text-red-500';
+      msg.textContent = 'Could not validate promo code';
+    }
+  }
+
+  function toggleLoyaltyPoints() {
+    usePoints = document.getElementById('usePointsToggle').checked;
+    recalculateCheckoutTotals();
+  }
+
+  async function handleCheckoutSubmit(e) {
+    e.preventDefault();
+    const errorAlert = document.getElementById('checkoutErrorAlert');
+    errorAlert.classList.add('d-none');
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+
+    // Format phone
+    payload.phone = '0' + payload.phone.replace(/^0+/, '');
+
+    // Add items from client cart
+    payload.itemsJson = JSON.stringify(window.CartState.items);
+    if (currentCoupon) {
+      payload.couponCode = currentCoupon.code;
+    }
+    if (usePoints && USER_POINTS > 0) {
+      payload.pointsToRedeem = USER_POINTS;
+    }
+
+    const btn = document.getElementById('placeOrderBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+
+    btn.disabled = true;
+    btnText.classList.add('d-none');
+    btnSpinner.classList.remove('d-none');
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        // Clear cart
+        localStorage.removeItem('stepup_cart');
+        if (window.CartState) window.CartState.items = [];
+        window.location.href = data.redirectUrl || `/orders/confirmed/${data.orderNo}`;
+      } else {
+        errorAlert.textContent = data.message || 'Checkout failed. Please check your information.';
+        errorAlert.classList.remove('d-none');
+        btn.disabled = false;
+        btnText.classList.remove('d-none');
+        btnSpinner.classList.add('d-none');
+      }
+    } catch (err) {
+      errorAlert.textContent = 'An unexpected network error occurred. Please try again.';
+      errorAlert.classList.remove('d-none');
+      btn.disabled = false;
+      btnText.classList.remove('d-none');
+      btnSpinner.classList.add('d-none');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initCheckoutView();
+  });
+</script>

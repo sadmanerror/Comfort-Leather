@@ -1,0 +1,133 @@
+<!-- Footer Component (Section 13) -->
+<footer class="bg-dark text-white pt-5 pb-3 mt-5">
+  <div class="container">
+    <!-- Top Newsletter Row -->
+    <div class="row align-items-center pb-4 mb-4 border-bottom border-secondary border-opacity-50">
+      <div class="col-12 col-md-6 mb-3 mb-md-0">
+        <h4 class="fw-bold mb-1 text-white">Join the Comfort Leather Club</h4>
+        <p class="text-secondary small mb-0">Subscribe for early access to seasonal clearances, new arrivals, and VIP deals.</p>
+      </div>
+      <div class="col-12 col-md-6">
+        <form id="newsletterForm" class="d-flex gap-2">
+          <input type="email" id="newsletterEmail" class="form-control form-control-sm bg-white bg-opacity-10 text-white border-secondary border-opacity-50" placeholder="Enter your email address" required>
+          <button type="submit" class="btn btn-danger btn-sm px-4 fw-semibold flex-shrink-0">Subscribe</button>
+        </form>
+        <div id="newsletterSuccess" class="text-success small mt-1" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Main Footer Links Columns -->
+    <div class="row g-4 mb-5">
+      <!-- About -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="fw-bold text-uppercase small text-white mb-3" style="letter-spacing: 0.5px;">About</h6>
+        <ul class="list-unstyled small text-secondary mb-0">
+          <li class="mb-2"><a href="/pages/about-us" class="text-secondary text-decoration-none hover-white">About Us</a></li>
+          <li class="mb-2"><a href="/pages/careers" class="text-secondary text-decoration-none hover-white">Careers</a></li>
+          <li class="mb-2"><a href="/pages/awards" class="text-secondary text-decoration-none hover-white">Awards &amp; Heritage</a></li>
+          <li class="mb-2"><a href="/pages/investors" class="text-secondary text-decoration-none hover-white">Investors</a></li>
+          <li class="mb-2"><a href="/pages/franchise" class="text-secondary text-decoration-none hover-white">Franchise Program</a></li>
+        </ul>
+      </div>
+
+      <!-- Information -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="fw-bold text-uppercase small text-white mb-3" style="letter-spacing: 0.5px;">Information</h6>
+        <ul class="list-unstyled small text-secondary mb-0">
+          <li class="mb-2"><a href="/pages/terms-and-conditions" class="text-secondary text-decoration-none hover-white">Terms &amp; Conditions</a></li>
+          <li class="mb-2"><a href="/pages/payment-options" class="text-secondary text-decoration-none hover-white">Payment Options</a></li>
+          <li class="mb-2"><a href="/pages/privacy-policy" class="text-secondary text-decoration-none hover-white">Privacy Policy</a></li>
+          <li class="mb-2"><a href="/pages/emi-policy" class="text-secondary text-decoration-none hover-white">EMI Facilities</a></li>
+          <li class="mb-2"><a href="/pages/coverage-areas" class="text-secondary text-decoration-none hover-white">Coverage Areas</a></li>
+        </ul>
+      </div>
+
+      <!-- Popular Brands -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="fw-bold text-uppercase small text-white mb-3" style="letter-spacing: 0.5px;">Brands</h6>
+        <ul class="list-unstyled small text-secondary mb-0">
+          <li class="mb-2"><a href="/collections/all" class="text-secondary text-decoration-none hover-white">Comfort Leather Signature</a></li>
+          <li class="mb-2"><a href="/collections/north-star" class="text-secondary text-decoration-none hover-white">North Star</a></li>
+          <li class="mb-2"><a href="/collections/power" class="text-secondary text-decoration-none hover-white">Power Athletics</a></li>
+          <li class="mb-2"><a href="/collections/hush-puppies" class="text-secondary text-decoration-none hover-white">Hush Puppies</a></li>
+          <li class="mb-2"><a href="/collections/comfit" class="text-secondary text-decoration-none hover-white">Comfit Orthopedic</a></li>
+          <li class="mb-2"><a href="/collections/red-label" class="text-secondary text-decoration-none hover-white">Red Label</a></li>
+        </ul>
+      </div>
+
+      <!-- Customer Service -->
+      <div class="col-6 col-md-3 col-lg-3">
+        <h6 class="fw-bold text-uppercase small text-white mb-3" style="letter-spacing: 0.5px;">Customer Service</h6>
+        <ul class="list-unstyled small text-secondary mb-0">
+          <li class="mb-2"><a href="/pages/faqs" class="text-secondary text-decoration-none hover-white">Frequently Asked Questions</a></li>
+          <li class="mb-2"><a href="/stores" class="text-secondary text-decoration-none hover-white">Retail Store Locator</a></li>
+          <li class="mb-2"><a href="/pages/all-about-feet" class="text-secondary text-decoration-none hover-white">All About Feet (Foot Care)</a></li>
+          <li class="mb-2"><a href="/blogs/stories" class="text-secondary text-decoration-none hover-white">Style Stories &amp; Guides</a></li>
+          <li class="mb-2"><a href="/track-order" class="text-secondary text-decoration-none hover-white">Track Courier Delivery</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Block -->
+      <div class="col-12 col-md-6 col-lg-3">
+        <h6 class="fw-bold text-uppercase small text-white mb-3" style="letter-spacing: 0.5px;">Connect With Us</h6>
+        <p class="small text-secondary mb-2">
+          <strong><%= (settings && settings.storeName) || 'Comfort Leather' %> Footwear Bangladesh</strong><br>
+          <%= (settings && settings.address) || 'House 42, Road 11, Gulshan-1, Dhaka-1212' %>
+        </p>
+        <p class="small text-secondary mb-2">
+          <i class="fa-solid fa-phone text-danger me-2"></i><%= (settings && settings.contactPhone) || '09666200300' %> (9am - 10pm)
+        </p>
+        <p class="small text-secondary mb-3">
+          <i class="fa-solid fa-envelope text-danger me-2"></i><%= (settings && settings.contactEmail) || 'support@comfortleather.com' %>
+        </p>
+        <!-- Social Icons -->
+        <div class="d-flex gap-2">
+          <a href="https://facebook.com" target="_blank" class="btn btn-sm btn-outline-secondary rounded-circle text-white p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://instagram.com" target="_blank" class="btn btn-sm btn-outline-secondary rounded-circle text-white p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://youtube.com" target="_blank" class="btn btn-sm btn-outline-secondary rounded-circle text-white p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="fa-brands fa-youtube"></i></a>
+          <a href="https://twitter.com" target="_blank" class="btn btn-sm btn-outline-secondary rounded-circle text-white p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="fa-brands fa-x-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Badges & Copyright Bottom Bar -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between pt-4 border-top border-secondary border-opacity-50 small text-secondary gap-3">
+      <div>
+        &copy; <span id="currentYear"><%= new Date().getFullYear() %></span> <%= (settings && settings.storeName) || 'Comfort Leather' %> Bangladesh Ltd. All Rights Reserved.
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-white text-dark py-1 px-2 border">Cash on Delivery</span>
+        <span class="badge text-white py-1 px-2" style="background-color: #E2136E;">bKash</span>
+        <span class="badge text-white py-1 px-2" style="background-color: #F7941D;">Nagad</span>
+        <span class="badge bg-primary py-1 px-2">Visa</span>
+        <span class="badge bg-warning text-dark py-1 px-2">Mastercard</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Newsletter AJAX subscription
+  const nForm = document.getElementById('newsletterForm');
+  if (nForm) {
+    nForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('newsletterEmail').value;
+      const successDiv = document.getElementById('newsletterSuccess');
+      try {
+        const res = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        successDiv.style.display = 'block';
+        successDiv.innerText = data.message || 'Subscribed successfully!';
+        nForm.reset();
+      } catch (err) {
+        successDiv.style.display = 'block';
+        successDiv.innerText = 'Thank you for subscribing!';
+      }
+    });
+  }
+</script>

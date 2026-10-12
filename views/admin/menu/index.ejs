@@ -1,0 +1,131 @@
+<!-- Mega-Menu Builder -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Mega-Menu Builder</h3>
+      <p class="text-muted small m-0">Configure top navigation menu items, dropdown columns, and category links</p>
+    </div>
+    <button class="btn btn-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#menuModal" onclick="openAddMenu()">
+      <i class="fa-solid fa-plus me-1"></i> Add Menu Item
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Order</th>
+            <th>Title</th>
+            <th>URL / Link</th>
+            <th>Badge</th>
+            <th>Type</th>
+            <th>Columns &amp; Sub-links Count</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (menuItems && menuItems.length) { %>
+            <% menuItems.forEach(m => { %>
+              <tr>
+                <td class="ps-3 fw-bold text-muted"><%= m.displayOrder %></td>
+                <td class="fw-bold text-dark"><%= m.title %></td>
+                <td class="text-muted"><%= m.link %></td>
+                <td>
+                  <% if (m.badge) { %>
+                    <span class="badge" style="background-color: <%= m.badgeColor || '#D6001C' %>;"><%= m.badge %></span>
+                  <% } else { %>
+                    <span class="text-muted">&mdash;</span>
+                  <% } %>
+                </td>
+                <td>
+                  <span class="badge <%= m.isMega ? 'bg-primary' : 'bg-secondary' %>">
+                    <%= m.isMega ? 'Mega Panel' : 'Direct Link' %>
+                  </span>
+                </td>
+                <td class="text-muted">
+                  <%= m.columns ? m.columns.length : 0 %> column(s)
+                </td>
+                <td>
+                  <span class="badge <%= m.isActive ? 'bg-success' : 'bg-secondary' %>">
+                    <%= m.isActive ? 'Active' : 'Disabled' %>
+                  </span>
+                </td>
+                <td class="text-end pe-3">
+                  <form action="/admin/menu/<%= m._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this menu item?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="8" class="text-center py-5 text-muted">No menu items configured.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Menu Modal -->
+<div class="modal fade" id="menuModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="menuModalTitle">Add Menu Item</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/menu" method="POST">
+        <input type="hidden" name="id" id="menuId">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Menu Title <span class="text-danger">*</span></label>
+            <input type="text" name="title" class="form-control" placeholder="e.g. SNEAKER STUDIO" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Link URL <span class="text-danger">*</span></label>
+            <input type="text" name="link" class="form-control" placeholder="/collections/sneakers" required>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Badge Text (Optional)</label>
+              <input type="text" name="badge" class="form-control" placeholder="HOT / SALE">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Badge Color</label>
+              <input type="color" name="badgeColor" class="form-control form-control-color w-100" value="#D6001C">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Display Order</label>
+              <input type="number" name="displayOrder" class="form-control" value="0">
+            </div>
+            <div class="col-6 d-flex align-items-end">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="isActive" id="menuActive" checked>
+                <label class="form-check-label small fw-medium" for="menuActive">Active</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Save Menu Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddMenu() {
+    document.getElementById('menuId').value = '';
+    document.getElementById('menuModalTitle').innerText = 'Add Top-Level Menu Item';
+  }
+</script>

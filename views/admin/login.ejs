@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CL Admin Portal Login | Comfort Leather</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/tw.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
+  <div class="card shadow-lg border-0 rounded-4 p-4 p-sm-5" style="max-width: 440px; width: 100%;">
+    <div class="text-center mb-4">
+      <img src="/img/logo.svg" alt="Comfort Leather" height="42" class="mb-3">
+      <h4 class="fw-bold text-dark m-0">CL Administrator Portal</h4>
+      <p class="text-muted small">Enter your staff or admin credentials to proceed</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert alert-danger py-2 small d-flex align-items-center gap-2 mb-3">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <form action="/admin/login" method="POST">
+      <input type="hidden" name="returnUrl" value="<%= returnUrl || '/admin' %>">
+      
+      <div class="mb-3">
+        <label class="form-label fw-semibold small text-secondary">Email Address</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
+          <input type="email" name="email" class="form-control border-start-0 ps-0" placeholder="admin@example.com" required autofocus value="admin@example.com">
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold small text-secondary">Password</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
+          <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="Enter password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold tw-shadow-md">
+        Sign In to CL Dashboard <i class="fa-solid fa-arrow-right ms-1"></i>
+      </button>
+    </form>
+
+    <div class="mt-3 text-center">
+      <span class="text-muted small">Need an administrator account?</span>
+      <a href="/admin/register" class="fw-bold text-danger text-decoration-none small ms-1">
+        Sign Up as Admin <i class="fa-solid fa-user-plus ms-1"></i>
+      </a>
+    </div>
+
+    <div class="mt-4 pt-3 border-top text-center">
+      <a href="/" class="text-muted text-decoration-none small">
+        <i class="fa-solid fa-arrow-left me-1"></i> Return to Public Storefront
+      </a>
+    </div>
+  </div>
+</body>
+</html>

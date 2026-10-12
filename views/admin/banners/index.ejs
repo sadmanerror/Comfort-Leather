@@ -1,0 +1,146 @@
+<!-- Banners Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Storefront Banners &amp; Sliders</h3>
+      <p class="text-muted small m-0">Manage homepage hero carousel, accessory banners, and voucher strips</p>
+    </div>
+    <button class="btn btn-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#bannerModal" onclick="openAddBanner()">
+      <i class="fa-solid fa-plus me-1"></i> Add Banner
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Position</th>
+            <th>Title &amp; Subtitle</th>
+            <th>Link Target</th>
+            <th>Order</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (banners && banners.length) { %>
+            <% banners.forEach(b => { %>
+              <tr>
+                <td class="ps-3">
+                  <span class="badge <%= b.position === 'hero' ? 'bg-danger' : b.position === 'accessories' ? 'bg-primary' : 'bg-dark' %>">
+                    <%= b.position.toUpperCase() %>
+                  </span>
+                </td>
+                <td>
+                  <div class="fw-semibold text-dark"><%= b.title || 'Untitled Banner' %></div>
+                  <small class="text-muted"><%= b.subtitle || '' %></small>
+                </td>
+                <td class="text-muted"><%= b.link %></td>
+                <td><%= b.displayOrder %></td>
+                <td>
+                  <span class="badge <%= b.isActive ? 'bg-success' : 'bg-secondary' %>">
+                    <%= b.isActive ? 'Active' : 'Hidden' %>
+                  </span>
+                </td>
+                <td class="text-end pe-3">
+                  <form action="/admin/banners/<%= b._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this banner?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No banners configured yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Banner Modal -->
+<div class="modal fade" id="bannerModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="bannerModalTitle">Add Banner / Slider</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/banners" method="POST">
+        <input type="hidden" name="id" id="bannerId">
+        <div class="modal-body">
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Position</label>
+              <select name="position" class="form-select" required>
+                <option value="hero">Hero Carousel Slide</option>
+                <option value="accessories">Accessories Full-Width Banner</option>
+                <option value="voucher">Gift Card Strip Banner</option>
+                <option value="promo">Promo Clearance Banner</option>
+              </select>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Button Text</label>
+              <input type="text" name="buttonText" class="form-control" placeholder="Shop Now" value="Shop Now">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Main Heading / Title</label>
+            <input type="text" name="title" class="form-control" placeholder="e.g. Step Up Your Style">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Subtitle / Promo Copy</label>
+            <input type="text" name="subtitle" class="form-control" placeholder="e.g. Discover the latest sneakers and formals">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Target Link (URL)</label>
+            <input type="text" name="link" class="form-control" placeholder="/collections/men" value="/collections/men" required>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Desktop Image URL (~1920x700) <span class="text-danger">*</span></label>
+              <input type="text" name="desktopImage" class="form-control" placeholder="/img/banner-hero-1.jpg" required value="/img/banner-hero-1.jpg">
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Mobile Image URL (~450x300)</label>
+              <input type="text" name="mobileImage" class="form-control" placeholder="/img/banner-hero-1-mob.jpg">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Display Order</label>
+              <input type="number" name="displayOrder" class="form-control" value="0">
+            </div>
+            <div class="col-6 d-flex align-items-end">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="isActive" id="bannerActive" checked>
+                <label class="form-check-label small fw-medium" for="bannerActive">Active</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Save Banner</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddBanner() {
+    document.getElementById('bannerId').value = '';
+    document.getElementById('bannerModalTitle').innerText = 'Add Banner / Slider';
+  }
+</script>

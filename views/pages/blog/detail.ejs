@@ -1,0 +1,107 @@
+<div class="container py-4 py-lg-5">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb tw-text-sm tw-mb-0">
+      <li class="breadcrumb-item"><a href="/" class="tw-text-neutral-500 hover:tw-text-primary-600">Home</a></li>
+      <li class="breadcrumb-item"><a href="/blogs/stories" class="tw-text-neutral-500 hover:tw-text-primary-600">Stories</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= post.title %></li>
+    </ol>
+  </nav>
+
+  <div class="row g-5">
+    <!-- Main Article Body -->
+    <div class="col-lg-8">
+      <article>
+        <div class="mb-3">
+          <span class="badge bg-primary-subtle text-primary tw-rounded-lg py-1.5 px-3 tw-text-xs font-semibold">
+            <%= post.category || 'Footwear Guide' %>
+          </span>
+          <span class="tw-text-xs tw-text-neutral-400 ms-2">
+            <%= new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-BD', { month: 'long', day: 'numeric', year: 'numeric' }) %>
+          </span>
+        </div>
+
+        <h1 class="tw-font-display tw-font-extrabold tw-text-2xl md:tw-text-4xl tw-text-neutral-900 mb-4">
+          <%= post.title %>
+        </h1>
+
+        <div class="d-flex align-items-center gap-3 pb-4 mb-4 border-bottom">
+          <div class="tw-w-10 tw-h-10 tw-rounded-full tw-bg-neutral-200 tw-text-neutral-700 d-flex align-items-center justify-content-center tw-font-bold tw-text-sm">
+            <%= (post.author || 'StepUp').charAt(0) %>
+          </div>
+          <div>
+            <div class="tw-text-xs tw-font-bold tw-text-neutral-900"><%= post.author || 'StepUp Editorial Team' %></div>
+            <div class="tw-text-2xs tw-text-neutral-500">Footwear Care Specialist</div>
+          </div>
+        </div>
+
+        <!-- Featured Image -->
+        <% if (post.coverImage) { %>
+          <div class="mb-4 rounded-3 overflow-hidden">
+            <img src="<%= post.coverImage %>" alt="<%= post.title %>" class="w-100 tw-max-h-96 tw-object-cover tw-rounded-2xl">
+          </div>
+        <% } %>
+
+        <!-- Article Content -->
+        <div class="article-content tw-text-neutral-800 tw-leading-relaxed tw-space-y-4 mb-5">
+          <%- post.content %>
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="p-4 tw-bg-neutral-50 tw-rounded-2xl d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <span class="tw-font-bold tw-text-xs tw-text-neutral-700">SHARE THIS ARTICLE:</span>
+          <div class="d-flex gap-2">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent('https://stepupshoes.com.bd/blogs/stories/' + post.slug) %>" target="_blank" class="btn btn-sm btn-outline-dark tw-rounded-xl">
+              <i class="bi bi-facebook me-1"></i> Facebook
+            </a>
+            <a href="https://api.whatsapp.com/send?text=<%= encodeURIComponent(post.title + ' https://stepupshoes.com.bd/blogs/stories/' + post.slug) %>" target="_blank" class="btn btn-sm btn-success tw-rounded-xl">
+              <i class="bi bi-whatsapp me-1"></i> WhatsApp
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Sidebar: Recent Articles & Featured Products -->
+    <div class="col-lg-4">
+      <div class="sticky-top" style="top: 90px;">
+        <!-- Recent Posts Widget -->
+        <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-4 mb-4">
+          <h3 class="tw-font-display tw-font-bold tw-text-base tw-text-neutral-900 mb-3 pb-2 border-bottom">
+            More Stories & Guides
+          </h3>
+          <% if (recentPosts && recentPosts.length > 0) { %>
+            <div class="tw-space-y-3">
+              <% recentPosts.forEach(rp => { %>
+                <div class="d-flex align-items-center gap-3">
+                  <a href="/blogs/stories/<%= rp.slug %>" class="flex-shrink-0">
+                    <img src="<%= rp.coverImage || '/img/placeholder-shoe.svg' %>" alt="<%= rp.title %>" class="tw-w-16 tw-h-16 tw-rounded-xl tw-object-cover">
+                  </a>
+                  <div>
+                    <h4 class="tw-font-bold tw-text-xs tw-text-neutral-900 mb-1 line-clamp-2">
+                      <a href="/blogs/stories/<%= rp.slug %>" class="tw-text-inherit tw-no-underline hover:tw-text-primary-600">
+                        <%= rp.title %>
+                      </a>
+                    </h4>
+                    <span class="tw-text-2xs tw-text-neutral-400">
+                      <%= new Date(rp.publishedAt || rp.createdAt).toLocaleDateString('en-BD', { month: 'short', day: 'numeric' }) %>
+                    </span>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Banner Ad Widget -->
+        <div class="card tw-border-primary-200 tw-bg-primary-50 tw-rounded-2xl p-4 text-center">
+          <h4 class="tw-font-display tw-font-bold tw-text-base tw-text-primary-900 mb-2">Upgrade Your Footwear</h4>
+          <p class="tw-text-xs tw-text-primary-800 mb-3">Explore our new seasonal arrivals handcrafted with genuine full-grain leather.</p>
+          <a href="/collections/all" class="btn btn-primary btn-sm tw-rounded-xl tw-font-bold px-4">
+            Shop Collections
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

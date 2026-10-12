@@ -1,0 +1,177 @@
+<!-- Collections Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Collections &amp; Campaigns</h3>
+      <p class="text-muted small m-0">Create rule-based dynamic collections or hand-picked product sets</p>
+    </div>
+    <button class="btn btn-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#collectionModal" onclick="openAddCollection()">
+      <i class="fa-solid fa-plus me-1"></i> Add Collection
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Collection Name</th>
+            <th>Slug</th>
+            <th>Type</th>
+            <th>Products / Rule Summary</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (collections && collections.length) { %>
+            <% collections.forEach(c => { %>
+              <tr>
+                <td class="ps-3 fw-semibold text-dark">
+                  <a href="/collections/<%= c.slug %>" target="_blank" class="text-dark text-decoration-none hover-underline">
+                    <%= c.name %>
+                  </a>
+                </td>
+                <td class="text-muted">/collections/<%= c.slug %></td>
+                <td>
+                  <span class="badge <%= c.isRuleBased ? 'bg-primary' : 'bg-info text-dark' %>">
+                    <%= c.isRuleBased ? 'Rule-Based Dynamic' : 'Manual Pick' %>
+                  </span>
+                </td>
+                <td class="text-muted">
+                  <% if (c.isRuleBased) { %>
+                    <%= c.rules?.gender || '' %> <%= c.rules?.minPrice ? 'Min: Tk ' + c.rules.minPrice : '' %> <%= c.rules?.maxPrice ? 'Max: Tk ' + c.rules.maxPrice : '' %>
+                  <% } else { %>
+                    <%= (c.manualProducts || []).length %> items assigned
+                  <% } %>
+                </td>
+                <td>
+                  <span class="badge <%= c.isActive ? 'bg-success' : 'bg-secondary' %>">
+                    <%= c.isActive ? 'Active' : 'Disabled' %>
+                  </span>
+                </td>
+                <td class="text-end pe-3">
+                  <form action="/admin/collections/<%= c._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this collection?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No collections created yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Collection Modal -->
+<div class="modal fade" id="collectionModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="collectionModalTitle">Create Collection</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/collections" method="POST">
+        <input type="hidden" name="id" id="collId">
+        <div class="modal-body">
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Collection Name <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. Executive Formals" required>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Slug (Optional)</label>
+              <input type="text" name="slug" class="form-control" placeholder="executive-formals">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Description</label>
+            <textarea name="description" rows="2" class="form-control"></textarea>
+          </div>
+
+          <!-- Type Selector -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Collection Type</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="isRuleBased" id="typeRule" value="true" checked onchange="toggleTypeUI()">
+                <label class="form-check-label small fw-medium" for="typeRule">Rule-Based Dynamic Filter</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="isRuleBased" id="typeManual" value="false" onchange="toggleTypeUI()">
+                <label class="form-check-label small fw-medium" for="typeManual">Manual Product Selection</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Rules Section -->
+          <div id="rulesSection" class="border rounded p-3 bg-light mb-3">
+            <h6 class="fw-bold small text-dark mb-2">Automated Filter Rules</h6>
+            <div class="row g-2">
+              <div class="col-6 col-sm-4">
+                <label class="form-label small text-muted">Gender</label>
+                <select name="ruleGender" class="form-select form-select-sm">
+                  <option value="">Any Gender</option>
+                  <option value="Men">Men</option>
+                  <option value="Women">Women</option>
+                  <option value="Children">Children</option>
+                </select>
+              </div>
+              <div class="col-6 col-sm-4">
+                <label class="form-label small text-muted">Min Price (Tk)</label>
+                <input type="number" name="ruleMinPrice" class="form-control form-control-sm" placeholder="0">
+              </div>
+              <div class="col-6 col-sm-4">
+                <label class="form-label small text-muted">Max Price (Tk)</label>
+                <input type="number" name="ruleMaxPrice" class="form-control form-control-sm" placeholder="5000">
+              </div>
+            </div>
+          </div>
+
+          <!-- Manual Selection Section -->
+          <div id="manualSection" class="border rounded p-3 bg-light mb-3 d-none">
+            <h6 class="fw-bold small text-dark mb-2">Select Products</h6>
+            <select name="manualProducts" class="form-select form-select-sm" multiple style="height: 120px;">
+              <% products.forEach(p => { %>
+                <option value="<%= p._id %>"><%= p.name %> (<%= formatBDT(p.price) %>)</option>
+              <% }) %>
+            </select>
+            <small class="text-muted d-block mt-1">Hold Ctrl (Cmd on Mac) to select multiple products.</small>
+          </div>
+
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" name="isActive" id="collActive" checked>
+            <label class="form-check-label small fw-medium" for="collActive">Is Active</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Save Collection</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleTypeUI() {
+    const isRule = document.getElementById('typeRule').checked;
+    document.getElementById('rulesSection').classList.toggle('d-none', !isRule);
+    document.getElementById('manualSection').classList.toggle('d-none', isRule);
+  }
+
+  function openAddCollection() {
+    document.getElementById('collId').value = '';
+    document.getElementById('collectionModalTitle').innerText = 'Create Collection';
+    document.getElementById('typeRule').checked = true;
+    toggleTypeUI();
+  }
+</script>

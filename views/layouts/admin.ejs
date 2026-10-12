@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | Comfort Leather Admin Panel</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <!-- Local Bundled Bootstrap 5 -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <!-- Tailwind CSS with tw- prefix -->
+  <link rel="stylesheet" href="/css/tw.css">
+  <style>
+    :root {
+      --admin-sidebar-width: 260px;
+      --admin-primary: #D6001C;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #F8F9FA;
+      color: #333333;
+    }
+    .admin-sidebar {
+      width: var(--admin-sidebar-width);
+      min-height: 100vh;
+      background: #111111;
+      color: #E0E0E0;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1030;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+    .admin-sidebar .nav-link {
+      color: #A0A0A0;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      font-weight: 500;
+      border-radius: 6px;
+      margin: 2px 10px;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .admin-sidebar .nav-link i {
+      width: 24px;
+      font-size: 16px;
+    }
+    .admin-sidebar .nav-link:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .admin-sidebar .nav-link.active {
+      color: #FFFFFF;
+      background: var(--admin-primary);
+    }
+    .admin-main {
+      margin-left: var(--admin-sidebar-width);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s ease;
+    }
+    .admin-topbar {
+      height: 64px;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E5E7EB;
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+    }
+    @media (max-width: 991.98px) {
+      .admin-sidebar {
+        transform: translateX(-100%);
+      }
+      .admin-sidebar.show {
+        transform: translateX(0);
+      }
+      .admin-main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar shadow" id="adminSidebar">
+    <div class="p-3 border-bottom border-secondary d-flex align-items-center justify-content-between">
+      <a href="/admin" class="text-decoration-none d-flex align-items-center gap-2">
+        <img src="/img/favicon.svg" alt="CL Admin" width="32" height="32">
+        <span class="fs-5 fw-bold text-white tracking-wide">CL <span class="text-danger">ADMIN</span></span>
+      </a>
+      <button class="btn btn-sm btn-dark d-lg-none" id="closeSidebarBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="py-3">
+      <small class="px-4 text-uppercase text-secondary fw-semibold" style="font-size: 11px;">Overview</small>
+      <nav class="nav flex-column mb-3">
+        <a class="nav-link <%= activeTab === 'dashboard' ? 'active' : '' %>" href="/admin">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+      </nav>
+
+      <small class="px-4 text-uppercase text-secondary fw-semibold" style="font-size: 11px;">Catalog & Merchandising</small>
+      <nav class="nav flex-column mb-3">
+        <a class="nav-link <%= activeTab === 'products' ? 'active' : '' %>" href="/admin/products">
+          <i class="fa-solid fa-shoe-prints"></i> Products
+        </a>
+        <a class="nav-link <%= activeTab === 'categories' ? 'active' : '' %>" href="/admin/categories">
+          <i class="fa-solid fa-folder-tree"></i> Categories
+        </a>
+        <a class="nav-link <%= activeTab === 'brands' ? 'active' : '' %>" href="/admin/brands">
+          <i class="fa-solid fa-tags"></i> Brands
+        </a>
+        <a class="nav-link <%= activeTab === 'collections' ? 'active' : '' %>" href="/admin/collections">
+          <i class="fa-solid fa-layer-group"></i> Collections
+        </a>
+      </nav>
+
+      <small class="px-4 text-uppercase text-secondary fw-semibold" style="font-size: 11px;">Sales & Fulfillment</small>
+      <nav class="nav flex-column mb-3">
+        <a class="nav-link <%= activeTab === 'orders' ? 'active' : '' %>" href="/admin/orders">
+          <i class="fa-solid fa-box-open"></i> Orders
+        </a>
+        <a class="nav-link <%= activeTab === 'coupons' ? 'active' : '' %>" href="/admin/coupons">
+          <i class="fa-solid fa-ticket"></i> Coupons & Discounts
+        </a>
+        <a class="nav-link <%= activeTab === 'customers' ? 'active' : '' %>" href="/admin/customers">
+          <i class="fa-solid fa-users"></i> Customers
+        </a>
+        <a class="nav-link <%= activeTab === 'reviews' ? 'active' : '' %>" href="/admin/reviews">
+          <i class="fa-solid fa-star-half-stroke"></i> Reviews Moderation
+        </a>
+      </nav>
+
+      <small class="px-4 text-uppercase text-secondary fw-semibold" style="font-size: 11px;">Storefront Content</small>
+      <nav class="nav flex-column mb-3">
+        <a class="nav-link <%= activeTab === 'banners' ? 'active' : '' %>" href="/admin/banners">
+          <i class="fa-solid fa-images"></i> Banners & Sliders
+        </a>
+        <a class="nav-link <%= activeTab === 'menu' ? 'active' : '' %>" href="/admin/menu">
+          <i class="fa-solid fa-bars-staggered"></i> Mega-Menu Builder
+        </a>
+        <a class="nav-link <%= activeTab === 'stores' ? 'active' : '' %>" href="/admin/stores">
+          <i class="fa-solid fa-location-dot"></i> Store Locator
+        </a>
+        <a class="nav-link <%= activeTab === 'blogs' ? 'active' : '' %>" href="/admin/blogs">
+          <i class="fa-solid fa-newspaper"></i> Blog Stories
+        </a>
+        <a class="nav-link <%= activeTab === 'pages' ? 'active' : '' %>" href="/admin/pages">
+          <i class="fa-solid fa-file-lines"></i> Static Pages
+        </a>
+      </nav>
+
+      <small class="px-4 text-uppercase text-secondary fw-semibold" style="font-size: 11px;">System</small>
+      <nav class="nav flex-column mb-3">
+        <a class="nav-link <%= activeTab === 'settings' ? 'active' : '' %>" href="/admin/settings">
+          <i class="fa-solid fa-gears"></i> Store Settings
+        </a>
+        <a class="nav-link text-info" href="/" target="_blank">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> View Storefront
+        </a>
+        <a class="nav-link text-danger" href="/admin/logout">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Admin Main Area -->
+  <div class="admin-main">
+    <!-- Topbar -->
+    <header class="admin-topbar px-4 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-dark d-lg-none p-1 px-2" id="toggleSidebarBtn">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h5 class="m-0 fw-semibold text-dark d-none d-sm-block"><%= title %></h5>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <a href="/admin/products/new" class="btn btn-danger btn-sm px-3 tw-shadow-sm d-none d-sm-flex align-items-center gap-1">
+          <i class="fa-solid fa-plus"></i> Add Product
+        </a>
+        <div class="dropdown">
+          <button class="btn btn-light btn-sm rounded-pill border dropdown-toggle d-flex align-items-center gap-2 px-3 py-1" data-bs-toggle="dropdown">
+            <i class="fa-solid fa-user-circle fs-5 text-secondary"></i>
+            <span class="fw-medium text-dark"><%= currentUser ? currentUser.name : 'Admin' %></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+            <li><h6 class="dropdown-header"><%= currentUser ? currentUser.email : 'admin@example.com' %></h6></li>
+            <li><span class="dropdown-item-text badge bg-secondary ms-3 mb-2"><%= currentUser ? currentUser.role : 'admin' %></span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/admin/settings"><i class="fa-solid fa-gears me-2 text-muted"></i>Settings</a></li>
+            <li><a class="dropdown-item text-danger" href="/admin/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="p-3 p-md-4 flex-grow-1">
+      <!-- Injected Body -->
+      <%- body %>
+    </main>
+
+    <!-- Admin Footer -->
+    <footer class="p-3 bg-white border-top text-center text-muted small">
+      CL Admin Portal &bull; Comfort Leather Footwear &bull; Version 1.0.0
+    </footer>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+    <div id="liveToast" class="toast align-items-center text-bg-dark border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage">Action completed successfully</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local Bundled Bootstrap JS -->
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js for Dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <script>
+    // Responsive sidebar toggle
+    const adminSidebar = document.getElementById('adminSidebar');
+    const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.addEventListener('click', () => {
+        adminSidebar.classList.toggle('show');
+      });
+    }
+    if (closeSidebarBtn) {
+      closeSidebarBtn.addEventListener('click', () => {
+        adminSidebar.classList.remove('show');
+      });
+    }
+
+    // URL Query Param Toast Notifications (?success=... or ?error=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const toastEl = document.getElementById('liveToast');
+    const toastMsg = document.getElementById('toastMessage');
+
+    if (urlParams.has('success')) {
+      toastEl.classList.remove('text-bg-dark', 'text-bg-danger');
+      toastEl.classList.add('text-bg-success');
+      toastMsg.innerText = urlParams.get('success');
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+      toast.show();
+    } else if (urlParams.has('error')) {
+      toastEl.classList.remove('text-bg-dark', 'text-bg-success');
+      toastEl.classList.add('text-bg-danger');
+      toastMsg.innerText = urlParams.get('error');
+      const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+      toast.show();
+    }
+
+    function showToast(message, type = 'success') {
+      toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-dark');
+      toastEl.classList.add(type === 'error' ? 'text-bg-danger' : 'text-bg-success');
+      toastMsg.innerText = message;
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+      toast.show();
+    }
+  </script>
+</body>
+</html>

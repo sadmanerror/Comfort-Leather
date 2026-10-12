@@ -1,0 +1,138 @@
+<!-- Coupons & Discounts Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Coupons &amp; Promo Codes</h3>
+      <p class="text-muted small m-0">Create percentage discounts, flat cash vouchers, and free-shipping codes</p>
+    </div>
+    <button class="btn btn-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#couponModal" onclick="openAddCoupon()">
+      <i class="fa-solid fa-plus me-1"></i> Add Coupon
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Coupon Code</th>
+            <th>Discount Value</th>
+            <th>Min Order</th>
+            <th>Max Discount</th>
+            <th>Uses / Limit</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (coupons && coupons.length) { %>
+            <% coupons.forEach(c => { %>
+              <tr>
+                <td class="ps-3 fw-bold text-dark">
+                  <code><%= c.code %></code>
+                </td>
+                <td class="fw-semibold text-danger">
+                  <%= c.type === 'percentage' ? c.value + '%' : formatBDT(c.value) %>
+                </td>
+                <td><%= formatBDT(c.minOrder) %></td>
+                <td><%= c.maxDiscount ? formatBDT(c.maxDiscount) : '&mdash;' %></td>
+                <td><%= c.usedCount %> / <%= c.maxUses > 0 ? c.maxUses : 'Unlimited' %></td>
+                <td><%= c.endDate ? c.endDate.toLocaleDateString('en-GB') : 'No Expiry' %></td>
+                <td>
+                  <span class="badge <%= c.isActive ? 'bg-success' : 'bg-secondary' %>">
+                    <%= c.isActive ? 'Active' : 'Disabled' %>
+                  </span>
+                </td>
+                <td class="text-end pe-3">
+                  <form action="/admin/coupons/<%= c._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this coupon code?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">No coupons configured.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Coupon Modal -->
+<div class="modal fade" id="couponModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="couponModalTitle">Add Coupon Code</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/coupons" method="POST">
+        <input type="hidden" name="id" id="couponId">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Coupon Code <span class="text-danger">*</span></label>
+            <input type="text" name="code" class="form-control text-uppercase fw-bold" placeholder="e.g. FESTIVE20" required>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Type</label>
+              <select name="type" class="form-select">
+                <option value="percentage">Percentage (%)</option>
+                <option value="fixed">Fixed Amount (Tk)</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Discount Value <span class="text-danger">*</span></label>
+              <input type="number" name="value" class="form-control" placeholder="15" required min="1">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Min Order Amount (Tk)</label>
+              <input type="number" name="minOrder" class="form-control" placeholder="1000" value="0">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Max Discount Cap (Tk)</label>
+              <input type="number" name="maxDiscount" class="form-control" placeholder="Optional cap">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Max Total Uses (0 = unlimited)</label>
+              <input type="number" name="maxUses" class="form-control" value="0">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Expiration Date</label>
+              <input type="date" name="endDate" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" name="isActive" id="couponActive" checked>
+            <label class="form-check-label small fw-medium" for="couponActive">Is Active</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Save Coupon</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddCoupon() {
+    document.getElementById('couponId').value = '';
+    document.getElementById('couponModalTitle').innerText = 'Add Coupon Code';
+  }
+</script>

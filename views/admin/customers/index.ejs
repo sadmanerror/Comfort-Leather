@@ -1,0 +1,52 @@
+<!-- Customers Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Registered Customers</h3>
+      <p class="text-muted small m-0">Track customer order frequency, lifetime value, and loyalty points</p>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Customer Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Total Orders</th>
+            <th>Lifetime Spend</th>
+            <th>Loyalty Points</th>
+            <th>Member Since</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (customers && customers.length) { %>
+            <% customers.forEach(c => { %>
+              <tr>
+                <td class="ps-3 fw-bold text-dark"><%= c.name %></td>
+                <td class="text-muted"><%= c.email %></td>
+                <td><%= c.phone || '&mdash;' %></td>
+                <td>
+                  <span class="badge bg-light text-dark border"><%= c.orderCount || 0 %> orders</span>
+                </td>
+                <td class="fw-bold text-dark"><%= formatBDT(c.totalSpent || 0) %></td>
+                <td>
+                  <span class="badge bg-success bg-opacity-10 text-success border border-success">
+                    <i class="fa-solid fa-coins me-1"></i><%= c.points || 0 %> pts
+                  </span>
+                </td>
+                <td class="text-muted"><%= c.createdAt.toLocaleDateString('en-GB') %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">No registered customer accounts found.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

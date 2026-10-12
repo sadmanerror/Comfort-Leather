@@ -1,0 +1,186 @@
+<!-- 7. COLLECTION / LISTING PAGES -->
+<div class="container py-4">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="/" class="text-secondary text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="/collections/all" class="text-secondary text-decoration-none">Collections</a></li>
+      <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page"><%= collectionTitle %></li>
+    </ol>
+  </nav>
+
+  <!-- Collection Banner / Header -->
+  <div class="card border-0 rounded-4 overflow-hidden mb-4 bg-dark text-white shadow-sm position-relative">
+    <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-center" style="min-height: 180px;">
+      <h2 class="display-6 fw-bold m-0 mb-2"><%= collectionTitle %></h2>
+      <% if (collectionDesc) { %>
+        <p class="text-white-50 small m-0 mb-2 col-12 col-md-8"><%= collectionDesc %></p>
+      <% } %>
+      <small class="text-white-50"><%= total %> products available</small>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Filter Sidebar (Desktop: column, Mobile: Offcanvas) -->
+    <div class="col-12 col-lg-3">
+      <!-- Mobile Filter Trigger Button -->
+      <div class="d-lg-none mb-3 d-flex justify-content-between align-items-center">
+        <button class="btn btn-outline-dark btn-sm rounded-pill px-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+          <i class="fa-solid fa-filter me-1"></i> Filter Products
+        </button>
+        <span class="small text-muted"><%= total %> Items</span>
+      </div>
+
+      <!-- Desktop Sidebar & Offcanvas Wrapper -->
+      <div class="offcanvas-lg offcanvas-start bg-white p-3 p-lg-0 rounded-3 shadow-none" tabindex="-1" id="filterOffcanvas">
+        <div class="offcanvas-header border-bottom d-lg-none mb-3">
+          <h5 class="offcanvas-title fw-bold">Filter Products</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterOffcanvas"></button>
+        </div>
+
+        <form id="filterForm" action="/collections/<%= slug %>" method="GET">
+          <!-- Active Filter Chips & Clear All -->
+          <% const hasFilters = query.brand || query.color || query.size || query.priceRange || query.onSale; %>
+          <% if (hasFilters) { %>
+            <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="small fw-bold text-dark">Active Filters</span>
+                <a href="/collections/<%= slug %>" class="small text-danger text-decoration-none fw-semibold">Clear All</a>
+              </div>
+              <div class="d-flex flex-wrap gap-1">
+                <% if (query.brand) { %><span class="badge bg-white text-dark border">Brand: <%= query.brand %></span><% } %>
+                <% if (query.color) { %><span class="badge bg-white text-dark border">Color: <%= query.color %></span><% } %>
+                <% if (query.size) { %><span class="badge bg-white text-dark border">Size: <%= query.size %></span><% } %>
+                <% if (query.onSale) { %><span class="badge bg-danger text-white">On Sale Only</span><% } %>
+              </div>
+            </div>
+          <% } %>
+
+          <!-- 1. Sale Only Switch -->
+          <div class="card border-0 shadow-sm p-3 rounded-3 mb-3 bg-white">
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" name="onSale" id="onSaleFilter" value="true" <%= query.onSale === 'true' ? 'checked' : '' %> onchange="this.form.submit()">
+              <label class="form-check-label small fw-bold text-danger" for="onSaleFilter">On Sale Only</label>
+            </div>
+          </div>
+
+          <!-- 2. Brand Filter -->
+          <div class="card border-0 shadow-sm p-3 rounded-3 mb-3 bg-white">
+            <h6 class="fw-bold small text-dark border-bottom pb-2 mb-2">Brand</h6>
+            <div class="overflow-y-auto" style="max-height: 180px;">
+              <% allBrands.forEach(b => { %>
+                <div class="form-check mb-1 small">
+                  <input class="form-check-input" type="radio" name="brand" value="<%= b.slug %>" id="br_<%= b.slug %>" <%= query.brand === b.slug ? 'checked' : '' %> onchange="this.form.submit()">
+                  <label class="form-check-label text-secondary" for="br_<%= b.slug %>"><%= b.name %></label>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- 3. Price Preset Ranges -->
+          <div class="card border-0 shadow-sm p-3 rounded-3 mb-3 bg-white">
+            <h6 class="fw-bold small text-dark border-bottom pb-2 mb-2">Price (BDT)</h6>
+            <% const pRanges = [
+              { val: 'under-1000', label: 'Under Tk 1,000' },
+              { val: '1001-1500', label: 'Tk 1,001 - 1,500' },
+              { val: '1501-2000', label: 'Tk 1,501 - 2,000' },
+              { val: '2001-3000', label: 'Tk 2,001 - 3,000' },
+              { val: '3001-4000', label: 'Tk 3,001 - 4,000' },
+              { val: 'above-5000', label: 'Above Tk 5,000' }
+            ]; %>
+            <div class="overflow-y-auto" style="max-height: 180px;">
+              <% pRanges.forEach(pr => { %>
+                <div class="form-check mb-1 small">
+                  <input class="form-check-input" type="radio" name="priceRange" value="<%= pr.val %>" id="pr_<%= pr.val %>" <%= query.priceRange === pr.val ? 'checked' : '' %> onchange="this.form.submit()">
+                  <label class="form-check-label text-secondary" for="pr_<%= pr.val %>"><%= pr.label %></label>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- 4. Size Filter (Chips) -->
+          <div class="card border-0 shadow-sm p-3 rounded-3 mb-3 bg-white">
+            <h6 class="fw-bold small text-dark border-bottom pb-2 mb-2">Footwear Size (BD/UK)</h6>
+            <div class="d-flex flex-wrap gap-1">
+              <% sizeOptions.forEach(sz => { %>
+                <button type="submit" name="size" value="<%= sz %>" class="btn btn-sm <%= query.size === sz ? 'btn-danger' : 'btn-outline-secondary' %> rounded px-2 py-1" style="font-size: 11px; min-width: 32px;">
+                  <%= sz %>
+                </button>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- 5. Color Swatches -->
+          <div class="card border-0 shadow-sm p-3 rounded-3 mb-3 bg-white">
+            <h6 class="fw-bold small text-dark border-bottom pb-2 mb-2">Color</h6>
+            <div class="d-flex flex-wrap gap-2">
+              <% colorOptions.forEach(clr => { %>
+                <a href="/collections/<%= slug %>?color=<%= clr %>" class="badge rounded-pill border <%= query.color === clr ? 'bg-danger text-white' : 'bg-light text-dark' %> text-decoration-none px-3 py-1">
+                  <%= clr %>
+                </a>
+              <% }) %>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Products Grid & Sort Toolbar -->
+    <div class="col-12 col-lg-9">
+      <!-- Sorting & View Toolbar -->
+      <div class="card border-0 shadow-sm p-3 rounded-3 bg-white mb-4 d-flex flex-row align-items-center justify-content-between">
+        <span class="text-secondary small fw-medium">Showing <strong><%= products.length %></strong> of <%= total %> items</span>
+        <div class="d-flex align-items-center gap-2">
+          <label class="small text-secondary fw-semibold text-nowrap d-none d-sm-inline">Sort by:</label>
+          <select class="form-select form-select-sm" style="width: auto;" onchange="window.location.href = updateQueryParam('sort', this.value)">
+            <option value="featured" <%= query.sort === 'featured' ? 'selected' : '' %>>Featured</option>
+            <option value="newest" <%= query.sort === 'newest' ? 'selected' : '' %>>Newest Arrivals</option>
+            <option value="price-low" <%= query.sort === 'price-low' ? 'selected' : '' %>>Price: Low to High</option>
+            <option value="price-high" <%= query.sort === 'price-high' ? 'selected' : '' %>>Price: High to Low</option>
+            <option value="best-selling" <%= query.sort === 'best-selling' ? 'selected' : '' %>>Best Selling</option>
+            <option value="discount" <%= query.sort === 'discount' ? 'selected' : '' %>>Highest Discount %</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="row g-3 g-md-4">
+        <% if (products && products.length) { %>
+          <% products.forEach(p => { %>
+            <div class="col-6 col-md-4">
+              <%- include('../partials/product-card', { p }) %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-filter-circle-xmark text-muted fs-1 mb-3 opacity-50"></i>
+            <h5 class="fw-bold text-dark">No products match your filters</h5>
+            <p class="text-muted small">Try loosening your price range or clearing specific size/color filters.</p>
+            <a href="/collections/<%= slug %>" class="btn btn-outline-dark btn-sm rounded-pill px-4">Clear All Filters</a>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Pagination Footer -->
+      <% if (pages > 1) { %>
+        <nav class="d-flex justify-content-center mt-5">
+          <ul class="pagination pagination-sm">
+            <% for (let i = 1; i <= pages; i++) { %>
+              <li class="page-item <%= page === i ? 'active' : '' %>">
+                <a class="page-link" href="#" onclick="window.location.href = updateQueryParam('page', <%= i %>); return false;"><%= i %></a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateQueryParam(key, value) {
+    const url = new URL(window.location.href);
+    url.searchParams.set(key, value);
+    return url.toString();
+  }
+</script>

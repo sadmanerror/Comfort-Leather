@@ -1,0 +1,119 @@
+<% var p = typeof p !== 'undefined' ? p : (typeof product !== 'undefined' ? product : {}); %>
+<!-- Reusable Product Card Component (Section 6) -->
+<div class="card h-100 border-0 shadow-sm rounded-3 product-card bg-white position-relative overflow-hidden transition-all">
+  <!-- Card Media Box with Primary & Hover Image Swap -->
+  <div class="product-card-media rounded-top position-relative overflow-hidden bg-light">
+    <!-- Sale Badge (Top-Left) -->
+    <% if (p.isOnSale) { %>
+      <div class="position-absolute top-0 start-0 m-2 z-2">
+        <span class="badge bg-danger fw-bold shadow-sm" style="font-size: 11px; padding: 4px 8px;">
+          -<%= p.discountPercent %>% SALE
+        </span>
+      </div>
+    <% } %>
+
+    <!-- Wishlist Heart Toggle (Top-Right) -->
+    <button type="button" class="btn btn-sm btn-light rounded-circle position-absolute top-0 end-0 m-2 z-2 shadow-sm wishlist-btn border-0 d-flex align-items-center justify-content-center"
+      data-product-id="<%= p._id %>" style="width: 34px; height: 34px;" title="Save to Wishlist">
+      <i class="fa-regular fa-heart text-danger"></i>
+    </button>
+
+    <!-- Images -->
+    <a href="/products/<%= p.slug %>" class="d-block w-100 h-100 text-decoration-none">
+      <img src="<%= p.primaryImage %>" alt="<%= p.name %>" class="primary-img w-100 h-100 object-fit-cover" loading="lazy">
+      <img src="<%= p.hoverImage %>" alt="<%= p.name %>" class="hover-img w-100 h-100 object-fit-cover" loading="lazy">
+    </a>
+
+    <!-- Quick View Hover Button (Desktop) -->
+    <button type="button" class="btn btn-dark btn-sm rounded-pill position-absolute bottom-0 start-50 translate-middle-x mb-2 z-2 quick-view-btn shadow d-none d-md-flex align-items-center gap-1 opacity-0 hover-opacity-100 transition-all"
+      onclick="openQuickView('<%= p._id %>')" style="font-size: 11px; padding: 4px 12px;">
+      <i class="fa-solid fa-eye"></i> Quick View
+    </button>
+  </div>
+
+  <!-- Card Body -->
+  <div class="card-body p-3 d-flex flex-column justify-content-between">
+    <div>
+      <!-- Available Size Chips Row under the Image -->
+      <div class="d-flex flex-wrap gap-1 mb-2 align-items-center">
+        <% 
+          const allSizes = [];
+          if (p.colors && p.colors.length) {
+            p.colors[0].sizes.forEach(s => {
+              if (!allSizes.find(x => x.size === s.size)) {
+                allSizes.push(s);
+              }
+            });
+          }
+          const displaySizes = allSizes.slice(0, 4);
+          const remainingSizes = allSizes.length - 4;
+        %>
+        <% displaySizes.forEach(s => { %>
+          <span class="badge border bg-light text-dark <%= s.stock <= 0 ? 'text-decoration-line-through text-muted opacity-50' : '' %>" 
+            style="font-size: 10px; padding: 2px 5px;" title="<%= s.stock > 0 ? 'In Stock' : 'Out of Stock' %>">
+            <%= s.size %>
+          </span>
+        <% }) %>
+        <% if (remainingSizes > 0) { %>
+          <span class="badge border bg-light text-muted" style="font-size: 10px; padding: 2px 4px;">
+            +<%= remainingSizes %>
+          </span>
+        <% } %>
+      </div>
+
+      <!-- Brand -->
+      <div class="small text-uppercase text-secondary fw-semibold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">
+        <% if (p.brand) { %>
+          <a href="/collections/<%= p.brand.slug || '' %>" class="text-secondary text-decoration-none hover-underline">
+            <%= p.brand.name || '' %>
+          </a>
+        <% } %>
+      </div>
+
+      <!-- Product Title (2-line clamp) -->
+      <h6 class="card-title fw-semibold mb-2">
+        <a href="/products/<%= p.slug %>" class="text-dark text-decoration-none hover-danger tw-line-clamp-2" style="font-size: 14px; line-height: 1.35;">
+          <%= p.name %>
+        </a>
+      </h6>
+
+      <!-- Price Block -->
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <% if (p.isOnSale) { %>
+          <span class="text-muted text-decoration-line-through small" style="font-size: 12px;">
+            <%= formatBDT(p.price) %>
+          </span>
+          <span class="fw-bold text-danger fs-6">
+            <%= formatBDT(p.salePrice) %>
+          </span>
+        <% } else { %>
+          <span class="fw-bold text-dark fs-6">
+            <%= formatBDT(p.price) %>
+          </span>
+        <% } %>
+      </div>
+
+      <!-- Color Name Label -->
+      <% if (p.colors && p.colors.length) { %>
+        <small class="text-muted d-block mb-3" style="font-size: 11.5px;">
+          <i class="fa-solid fa-circle me-1" style="color: <%= p.colors[0].hex || '#000' %>; font-size: 9px;"></i>
+          <%= p.colors[0].name %>
+        </small>
+      <% } %>
+    </div>
+
+    <!-- Action Button (Shop Now or Add to Cart) -->
+    <div class="mt-2">
+      <% if (p.category && (p.category.slug === 'accessories' || p.category.name === 'Accessories') && p.colors?.[0]?.sizes?.length === 1) { %>
+        <button type="button" class="btn btn-outline-dark btn-sm w-100 fw-semibold text-uppercase py-1 tw-tracking-wide add-to-cart-quick"
+          data-product-id="<%= p._id %>" data-color="<%= p.colors[0].name %>" data-size="<%= p.colors[0].sizes[0].size %>" style="font-size: 12px;">
+          Add to Cart
+        </button>
+      <% } else { %>
+        <a href="/products/<%= p.slug %>" class="btn btn-dark btn-sm w-100 fw-semibold text-uppercase py-1 tw-tracking-wide" style="font-size: 12px;">
+          Shop Now
+        </a>
+      <% } %>
+    </div>
+  </div>
+</div>

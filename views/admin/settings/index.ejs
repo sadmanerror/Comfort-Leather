@@ -1,0 +1,205 @@
+<!-- Store Settings Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Store Settings &amp; Configuration</h3>
+      <p class="text-muted small m-0">Shipping rates, bKash/Nagad merchant accounts, loyalty rules, and staff management</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Settings Form -->
+    <div class="col-12 col-xl-8">
+      <form action="/admin/settings" method="POST">
+        <!-- 1. Store Identity & Contact -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-store text-danger me-2"></i>1. Store Identity &amp; Contact</h5>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Store Name</label>
+              <input type="text" name="storeName" class="form-control" value="<%= settings.storeName || 'Comfort Leather' %>" required>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Tagline</label>
+              <input type="text" name="storeTagline" class="form-control" value="<%= settings.storeTagline || 'Handcrafted Comfort Footwear' %>">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">Store Logo URL / Path</label>
+            <div class="input-group">
+              <input type="text" name="logoUrl" id="storeLogoInput" class="form-control" value="<%= settings.logoUrl || '/img/logo.svg' %>">
+              <span class="input-group-text p-1 bg-white">
+                <img id="logoPreviewImg" src="<%= settings.logoUrl || '/img/logo.svg' %>" height="28" alt="Logo Preview" class="object-fit-contain">
+              </span>
+            </div>
+            <small class="text-muted">Default path: <code>/img/logo.svg</code>. You can paste any image URL (Cloudinary, Imgur, etc.) or a local path (such as <code>/img/imglogo.svg</code> or <code>/img/logo.png</code>).</small>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Customer Care Phone</label>
+              <input type="text" name="contactPhone" class="form-control" value="<%= settings.contactPhone || '09666200300' %>">
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">WhatsApp Support Number</label>
+              <input type="text" name="whatsappNumber" class="form-control" value="<%= settings.whatsappNumber || '8801700000000' %>">
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Support Email</label>
+              <input type="email" name="contactEmail" class="form-control" value="<%= settings.contactEmail || 'support@stepupshoes.com' %>">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">Office / Headquarters Address</label>
+            <input type="text" name="address" class="form-control" value="<%= settings.address || '' %>">
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label small fw-semibold text-secondary">Top Utility / Announcement Bar Text</label>
+            <input type="text" name="announcementBarText" class="form-control" value="<%= settings.announcementBarText || '' %>">
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" name="announcementBarActive" id="annActive" <%= settings.announcementBarActive ? 'checked' : '' %>>
+              <label class="form-check-label small" for="annActive">Enable Announcement Bar</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Shipping Rates -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-truck text-danger me-2"></i>2. Shipping Rates (BDT)</h5>
+          <div class="row g-3">
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Inside Dhaka (Tk)</label>
+              <input type="number" name="shippingInsideDhaka" class="form-control" value="<%= settings.shippingInsideDhaka || 60 %>" required>
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Outside Dhaka (Tk)</label>
+              <input type="number" name="shippingOutsideDhaka" class="form-control" value="<%= settings.shippingOutsideDhaka || 120 %>" required>
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Free Delivery Threshold (Tk)</label>
+              <input type="number" name="freeShippingThreshold" class="form-control" value="<%= settings.freeShippingThreshold || 2500 %>" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Payment Methods -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-credit-card text-danger me-2"></i>3. Payment Gateways &amp; Merchant Info</h5>
+          
+          <div class="border rounded p-3 mb-3 bg-light">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="codEnabled" id="codCheck" <%= settings.codEnabled ? 'checked' : '' %>>
+              <label class="form-check-label fw-semibold text-dark" for="codCheck">Cash on Delivery (COD)</label>
+            </div>
+            <small class="text-muted">Allow customers nationwide to pay in cash upon receiving package.</small>
+          </div>
+
+          <div class="border rounded p-3 mb-3 bg-light">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="bkashEnabled" id="bkashCheck" <%= settings.bkashEnabled ? 'checked' : '' %>>
+              <label class="form-check-label fw-semibold text-dark" for="bkashCheck">bKash Manual / Merchant</label>
+            </div>
+            <label class="form-label small text-secondary">bKash Merchant / Personal Number to Display</label>
+            <input type="text" name="bkashNumber" class="form-control form-control-sm" value="<%= settings.bkashNumber || '01712345678 (Merchant)' %>">
+          </div>
+
+          <div class="border rounded p-3 mb-3 bg-light">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="nagadEnabled" id="nagadCheck" <%= settings.nagadEnabled ? 'checked' : '' %>>
+              <label class="form-check-label fw-semibold text-dark" for="nagadCheck">Nagad Manual / Merchant</label>
+            </div>
+            <label class="form-label small text-secondary">Nagad Number to Display</label>
+            <input type="text" name="nagadNumber" class="form-control form-control-sm" value="<%= settings.nagadNumber || '01812345678 (Merchant)' %>">
+          </div>
+
+          <div class="border rounded p-3 bg-light">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="sslcommerzEnabled" id="sslCheck" <%= settings.sslcommerzEnabled ? 'checked' : '' %>>
+              <label class="form-check-label fw-semibold text-dark" for="sslCheck">SSLCommerz Sandbox Gateway</label>
+            </div>
+            <small class="text-muted">Live usage requires merchant credentials in .env</small>
+          </div>
+        </div>
+
+        <!-- 4. Loyalty Program -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-coins text-danger me-2"></i>4. Loyalty Club Rules</h5>
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Points Earned per Tk 100 Spent</label>
+              <input type="number" name="loyaltyPointsPer100Tk" class="form-control" value="<%= settings.loyaltyPointsPer100Tk || 1 %>">
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Redeem Value per Point (Tk)</label>
+              <input type="number" name="loyaltyRedeemRate" class="form-control" value="<%= settings.loyaltyRedeemRate || 1 %>">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-danger px-4 py-2 fw-semibold tw-shadow-md">
+          <i class="fa-solid fa-floppy-disk me-1"></i> Save All Settings
+        </button>
+      </form>
+    </div>
+
+    <!-- Right Column: Staff Management -->
+    <div class="col-12 col-xl-4">
+      <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-shield text-danger me-2"></i>Admin &amp; Staff Members</h5>
+        
+        <div class="list-group list-group-flush mb-4">
+          <% staffMembers.forEach(s => { %>
+            <div class="list-group-item px-0 py-2 border-bottom">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-bold small text-dark"><%= s.name %></div>
+                  <small class="text-muted"><%= s.email %></small>
+                </div>
+                <span class="badge <%= s.role === 'admin' ? 'bg-danger' : 'bg-secondary' %>">
+                  <%= s.role.toUpperCase() %>
+                </span>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <h6 class="fw-bold text-dark mb-2">Add New Staff Member</h6>
+        <form action="/admin/settings/staff" method="POST">
+          <div class="mb-2">
+            <input type="text" name="name" class="form-control form-control-sm" placeholder="Full Name" required>
+          </div>
+          <div class="mb-2">
+            <input type="email" name="email" class="form-control form-control-sm" placeholder="Email Address" required>
+          </div>
+          <div class="mb-2">
+            <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" required>
+          </div>
+          <div class="mb-3">
+            <select name="role" class="form-select form-select-sm">
+              <option value="staff">Staff (Fulfillment &amp; Catalog)</option>
+              <option value="admin">Admin (Full Control)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-dark btn-sm w-100 fw-semibold">
+            Create Staff Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const logoInput = document.getElementById('storeLogoInput');
+  const logoPreview = document.getElementById('logoPreviewImg');
+  if (logoInput && logoPreview) {
+    logoInput.addEventListener('input', () => {
+      if (logoInput.value.trim()) {
+        logoPreview.src = logoInput.value.trim();
+      }
+    });
+  }
+</script>

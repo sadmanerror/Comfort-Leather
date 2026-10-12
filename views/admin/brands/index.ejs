@@ -1,0 +1,128 @@
+<!-- Brands Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Brands Portfolio</h3>
+      <p class="text-muted small m-0">Manage licensed, signature, and imported shoe brands</p>
+    </div>
+    <button class="btn btn-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#brandModal" onclick="openAddBrand()">
+      <i class="fa-solid fa-plus me-1"></i> Add Brand
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Brand</th>
+            <th>Slug</th>
+            <th>Description</th>
+            <th>Order</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (brands && brands.length) { %>
+            <% brands.forEach(b => { %>
+              <tr>
+                <td class="ps-3 fw-semibold text-dark"><%= b.name %></td>
+                <td class="text-muted"><%= b.slug %></td>
+                <td class="text-muted text-truncate" style="max-width: 300px;"><%= b.description || '&mdash;' %></td>
+                <td><%= b.displayOrder %></td>
+                <td>
+                  <span class="badge <%= b.isActive ? 'bg-success' : 'bg-secondary' %>">
+                    <%= b.isActive ? 'Active' : 'Disabled' %>
+                  </span>
+                </td>
+                <td class="text-end pe-3">
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-1" onclick="openEditBrand('<%= b._id %>', '<%= b.name.replace(/'/g, '\\\'') %>', '<%= b.slug %>', '<%= (b.description || '').replace(/'/g, '\\\'') %>', <%= b.displayOrder %>, <%= b.isActive %>)">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <form action="/admin/brands/<%= b._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this brand?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No brands found.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Brand Modal -->
+<div class="modal fade" id="brandModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="brandModalTitle">Brand Details</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/brands" method="POST">
+        <input type="hidden" name="id" id="brandId">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Brand Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" id="brandName" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Slug (Optional)</label>
+            <input type="text" name="slug" id="brandSlug" class="form-control" placeholder="auto-generated">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Description</label>
+            <textarea name="description" id="brandDesc" rows="3" class="form-control" placeholder="Brand story and heritage..."></textarea>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Display Order</label>
+              <input type="number" name="displayOrder" id="brandOrder" class="form-control" value="0">
+            </div>
+            <div class="col-6 d-flex align-items-end">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" name="isActive" id="brandActive" checked>
+                <label class="form-check-label small fw-medium" for="brandActive">Active</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Save Brand</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddBrand() {
+    document.getElementById('brandId').value = '';
+    document.getElementById('brandModalTitle').innerText = 'Add Brand';
+    document.getElementById('brandName').value = '';
+    document.getElementById('brandSlug').value = '';
+    document.getElementById('brandDesc').value = '';
+    document.getElementById('brandOrder').value = '0';
+    document.getElementById('brandActive').checked = true;
+  }
+
+  function openEditBrand(id, name, slug, desc, order, isActive) {
+    document.getElementById('brandId').value = id;
+    document.getElementById('brandModalTitle').innerText = 'Edit Brand: ' + name;
+    document.getElementById('brandName').value = name;
+    document.getElementById('brandSlug').value = slug;
+    document.getElementById('brandDesc').value = desc;
+    document.getElementById('brandOrder').value = order || 0;
+    document.getElementById('brandActive').checked = isActive;
+    new bootstrap.Modal(document.getElementById('brandModal')).show();
+  }
+</script>

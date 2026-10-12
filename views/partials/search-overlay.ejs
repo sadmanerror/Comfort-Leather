@@ -1,0 +1,113 @@
+<!-- Search Overlay (Section 4.3) -->
+<div id="searchOverlay" class="search-overlay position-fixed top-0 start-0 w-100 bg-white shadow-lg border-bottom" style="z-index: 1060; display: none;">
+  <div class="container py-4">
+    <!-- Search Header & Close -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <span class="small fw-bold text-uppercase text-secondary tracking-wider">Search Catalog</span>
+      <button type="button" class="btn btn-sm btn-light border-0 fs-5 text-dark" id="closeSearchBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Live Search Input Form -->
+    <form action="/search" method="GET" class="mb-3 position-relative">
+      <div class="input-group input-group-lg border-bottom pb-2">
+        <span class="input-group-text bg-transparent border-0 ps-0 text-muted fs-4">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+        <input type="text" name="q" id="liveSearchInput" class="form-control bg-transparent border-0 fs-4 fw-normal text-dark shadow-none ps-2" 
+          placeholder="Search for shoes, sandals, sneakers, bags..." autocomplete="off">
+        <button type="submit" class="btn btn-danger px-4 rounded-pill fs-6 fw-semibold">
+          Search
+        </button>
+      </div>
+    </form>
+
+    <!-- Trending Chips -->
+    <div class="mb-4">
+      <small class="text-secondary fw-semibold me-2">Trending Searches:</small>
+      <div class="d-inline-flex flex-wrap gap-2 align-items-center mt-2 mt-sm-0">
+        <% const trending = (settings && settings.trendingSearchTerms && settings.trendingSearchTerms.length) 
+             ? settings.trendingSearchTerms 
+             : ['Power', 'North Star', 'Loafer', 'Sandal', 'Heel', 'Casual Shoe']; %>
+        <% trending.forEach(term => { %>
+          <a href="/search?q=<%= encodeURIComponent(term) %>" class="badge rounded-pill bg-light text-dark text-decoration-none border px-3 py-2 fw-normal hover-danger">
+            <%= term %>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- Live Suggestions Results Grid (Populated via AJAX) -->
+    <div id="searchResultsContainer" style="display: none;">
+      <h6 class="fw-bold small text-secondary text-uppercase border-bottom pb-2 mb-3">Matching Products</h6>
+      <div class="row g-3" id="liveResultsRow">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const searchOverlay = document.getElementById('searchOverlay');
+  const closeSearchBtn = document.getElementById('closeSearchBtn');
+  const liveSearchInput = document.getElementById('liveSearchInput');
+  const searchResultsContainer = document.getElementById('searchResultsContainer');
+  const liveResultsRow = document.getElementById('liveResultsRow');
+
+  function openSearch() {
+    searchOverlay.style.display = 'block';
+    setTimeout(() => { liveSearchInput.focus(); }, 100);
+  }
+
+  function closeSearch() {
+    searchOverlay.style.display = 'none';
+    liveSearchInput.value = '';
+    searchResultsContainer.style.display = 'none';
+  }
+
+  if (closeSearchBtn) {
+    closeSearchBtn.addEventListener('click', closeSearch);
+  }
+
+  // Debounced search (300ms)
+  let debounceTimeout = null;
+  liveSearchInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimeout);
+    const query = e.target.value.trim();
+
+    if (query.length < 2) {
+      searchResultsContainer.style.display = 'none';
+      liveResultsRow.innerHTML = '';
+      return;
+    }
+
+    debounceTimeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (data.products && data.products.length > 0) {
+          liveResultsRow.innerHTML = data.products.map(p => `
+            <div class="col-6 col-md-4 col-lg-2">
+              <a href="${p.url}" class="text-decoration-none text-dark d-block card border-0 p-2 h-100 hover-shadow rounded bg-light">
+                <img src="${p.image}" class="img-fluid rounded mb-2 object-fit-cover w-100" style="aspect-ratio: 1/1;" alt="${p.name}">
+                <div class="small fw-semibold text-truncate">${p.name}</div>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <span class="fw-bold text-danger small">${p.salePriceFormatted || p.priceFormatted}</span>
+                  ${p.salePriceFormatted ? `<span class="text-muted text-decoration-line-through" style="font-size: 11px;">${p.priceFormatted}</span>` : ''}
+                </div>
+              </a>
+            </div>
+          `).join('');
+          searchResultsContainer.style.display = 'block';
+        } else {
+          liveResultsRow.innerHTML = '<div class="col-12 text-muted small py-2">No matching products found.</div>';
+          searchResultsContainer.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Search suggestion error', err);
+      }
+    }, 300);
+  });
+</script>

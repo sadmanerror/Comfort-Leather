@@ -1,0 +1,81 @@
+<div class="container py-5">
+  <div class="tw-max-w-md mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-4">
+      <h1 class="tw-font-display tw-font-extrabold tw-text-2xl md:tw-text-3xl tw-text-neutral-900 mb-2">Create Your Account</h1>
+      <p class="tw-text-neutral-500 tw-text-sm">Join StepUp Shoes for seamless orders, parcel tracking & exclusive member discounts.</p>
+    </div>
+
+    <!-- Registration Card -->
+    <div class="card tw-border-neutral-200 tw-rounded-3xl tw-shadow-sm p-4 p-md-5">
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger tw-text-xs tw-rounded-xl mb-4">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i> <%= error %>
+        </div>
+      <% } %>
+
+      <form action="/account/register" method="POST">
+        <div class="mb-3">
+          <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">FULL NAME <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-white tw-text-neutral-400"><i class="bi bi-person"></i></span>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Asif Mahmud" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">EMAIL ADDRESS <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-white tw-text-neutral-400"><i class="bi bi-envelope"></i></span>
+            <input type="email" name="email" class="form-control" placeholder="asif@example.com" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">MOBILE PHONE (11 DIGITS)</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white tw-text-neutral-400">+880</span>
+            <input type="tel" name="phone" class="form-control" placeholder="17XXXXXXXX" pattern="[0-9]{10,11}">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">PASSWORD <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-white tw-text-neutral-400"><i class="bi bi-lock"></i></span>
+            <input type="password" name="password" id="regPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+            <button class="btn btn-outline-secondary border-start-0 bg-white" type="button" onclick="togglePasswordVisibility('regPassword')">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loyalty perk callout -->
+        <div class="tw-bg-green-50 tw-border tw-border-green-200 tw-rounded-xl p-3 mb-4">
+          <div class="d-flex align-items-center gap-2 tw-text-xs tw-text-green-800">
+            <i class="bi bi-check-circle-fill text-success"></i>
+            <span><strong>Bonus:</strong> Receive 50 Club StepUp reward points immediately upon registration!</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100 tw-rounded-xl tw-font-bold tw-py-3 mb-3">
+          Create Account
+        </button>
+
+        <div class="text-center tw-text-xs tw-text-neutral-500">
+          Already registered? 
+          <a href="/account/login" class="tw-font-bold tw-text-primary-600 hover:tw-text-primary-700 tw-no-underline">Sign in here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePasswordVisibility(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.type = el.type === 'password' ? 'text' : 'password';
+    }
+  }
+</script>

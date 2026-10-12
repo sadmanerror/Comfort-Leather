@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <rect width="800" height="500" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="2"/>
+  <rect x="0" y="0" width="800" height="60" fill="#111111"/>
+  <text x="400" y="40" font-family="'Poppins', sans-serif" font-weight="700" font-size="22" fill="#FFFFFF" text-anchor="middle">
+    STANDARD FOOTWEAR SIZE CONVERSION GUIDE
+  </text>
+  
+  <!-- Table Header -->
+  <rect x="50" y="90" width="700" height="40" fill="#D6001C"/>
+  <text x="120" y="116" font-family="'Poppins', sans-serif" font-weight="700" font-size="16" fill="#FFFFFF" text-anchor="middle">BD / UK Size</text>
+  <text x="270" y="116" font-family="'Poppins', sans-serif" font-weight="700" font-size="16" fill="#FFFFFF" text-anchor="middle">US Men</text>
+  <text x="420" y="116" font-family="'Poppins', sans-serif" font-weight="700" font-size="16" fill="#FFFFFF" text-anchor="middle">US Women</text>
+  <text x="560" y="116" font-family="'Poppins', sans-serif" font-weight="700" font-size="16" fill="#FFFFFF" text-anchor="middle">EU Size</text>
+  <text x="670" y="116" font-family="'Poppins', sans-serif" font-weight="700" font-size="16" fill="#FFFFFF" text-anchor="middle">Foot (cm)</text>
+
+  <!-- Table Rows -->
+  <g font-family="'Poppins', sans-serif" font-size="15" fill="#333333">
+    <!-- Row 1 -->
+    <rect x="50" y="130" width="700" height="36" fill="#F9FAFB"/>
+    <text x="120" y="154" text-anchor="middle" font-weight="600">5</text><text x="270" y="154" text-anchor="middle">6</text><text x="420" y="154" text-anchor="middle">7</text><text x="560" y="154" text-anchor="middle">38</text><text x="670" y="154" text-anchor="middle">24.0 cm</text>
+    <!-- Row 2 -->
+    <rect x="50" y="166" width="700" height="36" fill="#FFFFFF"/>
+    <text x="120" y="190" text-anchor="middle" font-weight="600">6</text><text x="270" y="190" text-anchor="middle">7</text><text x="420" y="190" text-anchor="middle">8</text><text x="560" y="190" text-anchor="middle">39.5</text><text x="670" y="190" text-anchor="middle">24.8 cm</text>
+    <!-- Row 3 -->
+    <rect x="50" y="202" width="700" height="36" fill="#F9FAFB"/>
+    <text x="120" y="226" text-anchor="middle" font-weight="600">7</text><text x="270" y="226" text-anchor="middle">8</text><text x="420" y="226" text-anchor="middle">9</text><text x="560" y="226" text-anchor="middle">41</text><text x="670" y="226" text-anchor="middle">25.7 cm</text>
+    <!-- Row 4 -->
+    <rect x="50" y="238" width="700" height="36" fill="#FFFFFF"/>
+    <text x="120" y="262" text-anchor="middle" font-weight="600">8</text><text x="270" y="262" text-anchor="middle">9</text><text x="420" y="262" text-anchor="middle">10</text><text x="560" y="262" text-anchor="middle">42</text><text x="670" y="262" text-anchor="middle">26.5 cm</text>
+    <!-- Row 5 -->
+    <rect x="50" y="274" width="700" height="36" fill="#F9FAFB"/>
+    <text x="120" y="298" text-anchor="middle" font-weight="600">9</text><text x="270" y="298" text-anchor="middle">10</text><text x="420" y="298" text-anchor="middle">11</text><text x="560" y="298" text-anchor="middle">43.5</text><text x="670" y="298" text-anchor="middle">27.3 cm</text>
+    <!-- Row 6 -->
+    <rect x="50" y="310" width="700" height="36" fill="#FFFFFF"/>
+    <text x="120" y="334" text-anchor="middle" font-weight="600">10</text><text x="270" y="334" text-anchor="middle">11</text><text x="420" y="334" text-anchor="middle">12</text><text x="560" y="334" text-anchor="middle">45</text><text x="670" y="334" text-anchor="middle">28.2 cm</text>
+    <!-- Row 7 -->
+    <rect x="50" y="346" width="700" height="36" fill="#F9FAFB"/>
+    <text x="120" y="370" text-anchor="middle" font-weight="600">11</text><text x="270" y="370" text-anchor="middle">12</text><text x="420" y="370" text-anchor="middle">13</text><text x="560" y="370" text-anchor="middle">46</text><text x="670" y="370" text-anchor="middle">29.0 cm</text>
+  </g>
+
+  <!-- Instructions Note -->
+  <text x="50" y="420" font-family="'Poppins', sans-serif" font-weight="600" font-size="14" fill="#666666">
+    💡 How to measure: Stand on a piece of paper, trace around your foot with a pencil held vertically, and measure heel to longest toe.
+  </text>
+</svg>

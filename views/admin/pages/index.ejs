@@ -1,0 +1,117 @@
+<!-- Static Pages Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Static Pages Content</h3>
+      <p class="text-muted small m-0">Edit customer policies, Terms, FAQs, About Us, and Foot Care Guides</p>
+    </div>
+    <button class="btn btn-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#pageModal" onclick="openAddPage()">
+      <i class="fa-solid fa-plus me-1"></i> Add New Page
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Page Title</th>
+            <th>URL Path</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (pages && pages.length) { %>
+            <% pages.forEach(p => { %>
+              <tr>
+                <td class="ps-3 fw-bold text-dark">
+                  <a href="/pages/<%= p.slug %>" target="_blank" class="text-dark text-decoration-none hover-underline">
+                    <%= p.title %>
+                  </a>
+                </td>
+                <td class="text-muted">/pages/<%= p.slug %></td>
+                <td>
+                  <span class="badge <%= p.isPublished ? 'bg-success' : 'bg-secondary' %>">
+                    <%= p.isPublished ? 'Published' : 'Draft' %>
+                  </span>
+                </td>
+                <td class="text-end pe-3">
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-1" onclick="openEditPage('<%= p._id %>', '<%= p.title.replace(/'/g, '\\\'') %>', '<%= p.slug %>', `<%= p.content.replace(/`/g, '\\`') %>`, <%= p.isPublished %>)">
+                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit Content
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" class="text-center py-5 text-muted">No static pages found.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Page Modal -->
+<div class="modal fade" id="pageModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="pageModalTitle">Edit Page Content</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/pages" method="POST">
+        <input type="hidden" name="id" id="pageId">
+        <div class="modal-body">
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Page Title <span class="text-danger">*</span></label>
+              <input type="text" name="title" id="pageTitle" class="form-control" required>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold">Slug <span class="text-danger">*</span></label>
+              <input type="text" name="slug" id="pageSlug" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Page Content (HTML)</label>
+            <textarea name="content" id="pageContent" rows="10" class="form-control" required></textarea>
+          </div>
+
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" name="isPublished" id="pagePublished" checked>
+            <label class="form-check-label small fw-medium" for="pagePublished">Is Published</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Save Page</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddPage() {
+    document.getElementById('pageId').value = '';
+    document.getElementById('pageModalTitle').innerText = 'Add New Static Page';
+    document.getElementById('pageTitle').value = '';
+    document.getElementById('pageSlug').value = '';
+    document.getElementById('pageContent').value = '';
+    document.getElementById('pagePublished').checked = true;
+  }
+
+  function openEditPage(id, title, slug, content, isPublished) {
+    document.getElementById('pageId').value = id;
+    document.getElementById('pageModalTitle').innerText = 'Edit Page: ' + title;
+    document.getElementById('pageTitle').value = title;
+    document.getElementById('pageSlug').value = slug;
+    document.getElementById('pageContent').value = content;
+    document.getElementById('pagePublished').checked = isPublished;
+    new bootstrap.Modal(document.getElementById('pageModal')).show();
+  }
+</script>

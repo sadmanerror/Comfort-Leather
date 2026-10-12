@@ -1,0 +1,540 @@
+<!-- 8. PRODUCT DETAIL PAGE -->
+<div class="container py-4">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="/" class="text-secondary text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="/collections/<%= product.category ? product.category.slug : 'all' %>" class="text-secondary text-decoration-none"><%= product.category ? product.category.name : 'Shoes' %></a></li>
+      <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page"><%= product.name %></li>
+    </ol>
+  </nav>
+
+  <div class="row g-4 g-lg-5 mb-5">
+    <!-- Left Column: Gallery & Thumbnails -->
+    <div class="col-12 col-md-6 col-lg-7">
+      <div class="row g-2">
+        <!-- Thumbnails Strip (Desktop: left vertical) -->
+        <div class="col-2 d-none d-sm-block">
+          <div class="d-flex flex-column gap-2" id="galleryThumbnails">
+            <% 
+              let allMedia = [];
+              if (product.colors && product.colors.length) {
+                product.colors.forEach(c => {
+                  if (c.images) c.images.forEach(img => allMedia.push({ type: 'image', url: img.url }));
+                });
+              }
+              if (!allMedia.length) allMedia.push({ type: 'image', url: product.primaryImage });
+              if (product.video && product.video.url) allMedia.push({ type: 'video', url: product.video.url });
+            %>
+            <% allMedia.forEach((media, idx) => { %>
+              <div class="border rounded p-1 cursor-pointer gallery-thumb <%= idx === 0 ? 'border-danger shadow-sm' : '' %>" 
+                onclick="switchGalleryMedia('<%= media.url %>', '<%= media.type %>', this)" style="cursor: pointer;">
+                <% if (media.type === 'video') { %>
+                  <div class="bg-dark text-white d-flex align-items-center justify-content-center rounded" style="aspect-ratio: 1/1;">
+                    <i class="fa-solid fa-play"></i>
+                  </div>
+                <% } else { %>
+                  <img src="<%= media.url %>" class="w-100 rounded object-fit-cover" style="aspect-ratio: 1/1;" alt="Thumbnail">
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <!-- Main Display View with Zoom on Hover -->
+        <div class="col-12 col-sm-10">
+          <div class="position-relative overflow-hidden rounded-3 border bg-light main-image-box" id="mainImageBox" style="aspect-ratio: 1/1;">
+            <% if (product.isOnSale) { %>
+              <span class="badge bg-danger position-absolute top-0 start-0 m-3 z-2 px-3 py-2 fw-bold shadow">
+                -<%= product.discountPercent %>% SALE
+              </span>
+            <% } %>
+
+            <img id="mainDisplayImg" src="<%= product.primaryImage %>" alt="<%= product.name %>" class="w-100 h-100 object-fit-cover transition-all" style="cursor: crosshair;">
+            <video id="mainDisplayVideo" src="" controls class="w-100 h-100 object-fit-cover" style="display: none;"></video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Product Info & Purchase Actions -->
+    <div class="col-12 col-md-6 col-lg-5">
+      <div class="ps-lg-2">
+        <!-- Brand -->
+        <% if (product.brand) { %>
+          <a href="/collections/<%= product.brand.slug %>" class="text-uppercase text-secondary fw-bold small text-decoration-none hover-underline d-block mb-1" style="letter-spacing: 0.5px;">
+            <%= product.brand.name %>
+          </a>
+        <% } %>
+
+        <!-- Title -->
+        <h2 class="fw-bold text-dark mb-2 fs-3"><%= product.name %></h2>
+
+        <!-- Rating & Reviews -->
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="text-warning small">
+            <% for (let i = 1; i <= 5; i++) { %>
+              <i class="fa-solid fa-star <%= i <= Math.round(product.ratingAvg || 5) ? '' : 'text-muted text-opacity-25' %>"></i>
+            <% } %>
+          </div>
+          <a href="#reviewsSection" class="small text-muted text-decoration-none">
+            (<%= reviews ? reviews.length : 0 %> reviews)
+          </a>
+          <span class="text-muted small">&bull; SKU: <span id="currentSkuDisplay"><%= product.colors?.[0]?.sizes?.[0]?.sku || product.slug %></span></span>
+        </div>
+
+        <!-- Price Block -->
+        <div class="p-3 bg-light rounded-3 mb-4 border">
+          <div class="d-flex align-items-baseline gap-3 mb-1">
+            <% if (product.isOnSale) { %>
+              <span class="fs-2 fw-bold text-danger"><%= formatBDT(product.salePrice) %></span>
+              <span class="fs-5 text-muted text-decoration-line-through"><%= formatBDT(product.price) %></span>
+              <span class="badge bg-success-subtle text-success border border-success fw-bold px-2 py-1">
+                You save <%= formatBDT(product.price - product.salePrice) %>
+              </span>
+            <% } else { %>
+              <span class="fs-2 fw-bold text-dark"><%= formatBDT(product.price) %></span>
+            <% } %>
+          </div>
+          <small class="text-secondary d-block">Price inclusive of all applicable taxes. Cash on Delivery available.</small>
+        </div>
+
+        <!-- Color Variant Selector -->
+        <% if (product.colors && product.colors.length) { %>
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-dark text-uppercase mb-2">
+              Color: <span class="fw-normal text-muted" id="selectedColorName"><%= product.colors[0].name %></span>
+            </label>
+            <div class="d-flex flex-wrap gap-2">
+              <% product.colors.forEach((c, idx) => { %>
+                <button type="button" class="btn btn-sm border rounded-pill d-flex align-items-center gap-2 px-3 py-1 color-swatch-btn <%= idx === 0 ? 'border-danger border-2 fw-bold' : 'btn-light' %>"
+                  onclick="selectColorVariant(<%= idx %>, this)" data-color-name="<%= c.name %>">
+                  <span class="rounded-circle d-inline-block border" style="width: 14px; height: 14px; background-color: <%= c.hex || '#000' %>;"></span>
+                  <%= c.name %>
+                </button>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Size Variant Selector & Stock Notification -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label small fw-bold text-dark text-uppercase m-0">Select Size (BD/UK)</label>
+            <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0 small fw-semibold" data-bs-toggle="modal" data-bs-target="#sizeChartModal">
+              <i class="fa-solid fa-ruler-combined me-1"></i> Size Chart
+            </button>
+          </div>
+          <div class="d-flex flex-wrap gap-2" id="sizeChipsContainer">
+            <!-- Rendered dynamically for active color -->
+          </div>
+          <div class="mt-2 small" id="stockStatusText"></div>
+        </div>
+
+        <!-- Quantity Stepper -->
+        <div class="mb-4 d-flex align-items-center gap-3">
+          <label class="small fw-bold text-dark text-uppercase m-0">Quantity:</label>
+          <div class="input-group input-group-sm" style="width: 110px;">
+            <button class="btn btn-outline-secondary" type="button" onclick="decrementQty()">-</button>
+            <input type="number" id="purchaseQty" class="form-control text-center" value="1" min="1" max="10" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="incrementQty()">+</button>
+          </div>
+        </div>
+
+        <!-- Action Buttons (Add to Cart, Buy Now, WhatsApp Order) -->
+        <div class="d-grid gap-2 mb-4">
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger btn-lg flex-grow-1 fw-bold text-uppercase py-3 rounded-0 shadow-sm" id="pdpAddToCartBtn">
+              <i class="fa-solid fa-cart-shopping me-2"></i> Add to Cart
+            </button>
+            <button type="button" class="btn btn-outline-dark btn-lg px-4 rounded-0 wishlist-btn" data-product-id="<%= product._id %>" title="Save to Wishlist">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
+
+          <button type="button" class="btn btn-dark btn-lg fw-bold text-uppercase py-2 rounded-0" id="pdpBuyNowBtn">
+            Buy Now
+          </button>
+
+          <!-- Order via WhatsApp Button -->
+          <% 
+            const encodedProdUrl = encodeURIComponent(`http://localhost:5000/products/${product.slug}`);
+            const waMsg = encodeURIComponent(`Hi StepUp Shoes! I would like to order "${product.name}" (${encodedProdUrl}). Please guide me through delivery.`);
+          %>
+          <a href="https://wa.me/<%= (settings && settings.whatsappNumber) || '8801700000000' %>?text=<%= waMsg %>" 
+             target="_blank" class="btn btn-success fw-bold text-uppercase py-2 rounded-0 d-flex align-items-center justify-content-center gap-2">
+            <i class="fa-brands fa-whatsapp fs-5"></i> Order via WhatsApp
+          </a>
+        </div>
+
+        <!-- Delivery & Service Benefits -->
+        <div class="border rounded-3 p-3 bg-light small mb-4">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="fa-solid fa-truck-fast text-danger"></i>
+            <span>Inside Dhaka: 24-48 Hours &bull; Outside Dhaka: 3-5 Days</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="fa-solid fa-hand-holding-dollar text-success"></i>
+            <span>Cash on Delivery &amp; bKash/Nagad Verified</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-rotate-left text-primary"></i>
+            <span>7-Day Easy Exchange Policy on Unworn Footwear</span>
+          </div>
+        </div>
+
+        <!-- Specifications & Details Accordion -->
+        <div class="accordion accordion-flush border rounded-3 mb-4" id="productDetailsAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#accDesc">
+                Product Description
+              </button>
+            </h2>
+            <div id="accDesc" class="accordion-collapse collapse show" data-bs-parent="#productDetailsAccordion">
+              <div class="accordion-body small text-secondary">
+                <%- product.description || product.shortDesc %>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#accSpecs">
+                Specifications &amp; Materials
+              </button>
+            </h2>
+            <div id="accSpecs" class="accordion-collapse collapse" data-bs-parent="#productDetailsAccordion">
+              <div class="accordion-body small text-secondary">
+                <table class="table table-sm table-borderless mb-0">
+                  <tbody>
+                    <% if (product.specs?.material) { %><tr><td class="text-muted" style="width: 140px;">Material:</td><td class="fw-semibold text-dark"><%= product.specs.material %></td></tr><% } %>
+                    <% if (product.specs?.sole) { %><tr><td class="text-muted">Sole:</td><td class="fw-semibold text-dark"><%= product.specs.sole %></td></tr><% } %>
+                    <% if (product.specs?.closure) { %><tr><td class="text-muted">Closure:</td><td class="fw-semibold text-dark"><%= product.specs.closure %></td></tr><% } %>
+                    <% if (product.specs?.occasion) { %><tr><td class="text-muted">Occasion:</td><td class="fw-semibold text-dark"><%= product.specs.occasion %></td></tr><% } %>
+                    <% if (product.specs?.careInstructions) { %><tr><td class="text-muted">Care:</td><td class="fw-semibold text-dark"><%= product.specs.careInstructions %></td></tr><% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#accReturns">
+                Delivery &amp; Return Terms
+              </button>
+            </h2>
+            <div id="accReturns" class="accordion-collapse collapse" data-bs-parent="#productDetailsAccordion">
+              <div class="accordion-body small text-secondary">
+                We deliver nationwide in Bangladesh. Delivery charge is Tk <%= (settings && settings.shippingInsideDhaka) || 60 %> inside Dhaka and Tk <%= (settings && settings.shippingOutsideDhaka) || 120 %> outside Dhaka. Free shipping on orders over Tk <%= (settings && settings.freeShippingThreshold) || 2500 %>. Items can be exchanged within 7 days at any of our physical outlets or via postal return.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Reviews Section -->
+  <section id="reviewsSection" class="border-top pt-5 mb-5">
+    <div class="row g-4">
+      <div class="col-12 col-md-5">
+        <h4 class="fw-bold text-dark mb-3">Customer Feedback</h4>
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div class="display-4 fw-bold text-dark"><%= product.ratingAvg || '5.0' %></div>
+          <div>
+            <div class="text-warning">
+              <% for (let i = 1; i <= 5; i++) { %><i class="fa-solid fa-star"></i><% } %>
+            </div>
+            <small class="text-muted">Based on <%= reviews.length %> reviews</small>
+          </div>
+        </div>
+
+        <!-- Submit Review Form -->
+        <div class="card border-0 shadow-sm p-3 rounded-3 bg-light">
+          <h6 class="fw-bold text-dark mb-3">Leave a Review</h6>
+          <form id="pdpReviewForm">
+            <input type="hidden" name="productId" value="<%= product._id %>">
+            <div class="mb-2">
+              <label class="form-label small text-secondary mb-1">Rating</label>
+              <select name="rating" class="form-select form-select-sm" required>
+                <option value="5">5 Stars - Outstanding</option>
+                <option value="4">4 Stars - Very Good</option>
+                <option value="3">3 Stars - Average</option>
+                <option value="2">2 Stars - Disappointed</option>
+                <option value="1">1 Star - Poor</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <input type="text" name="name" class="form-control form-control-sm" placeholder="Your Name" required>
+            </div>
+            <div class="mb-2">
+              <input type="text" name="title" class="form-control form-control-sm" placeholder="Review Title (e.g. Super comfortable leather)">
+            </div>
+            <div class="mb-3">
+              <textarea name="comment" rows="3" class="form-control form-control-sm" placeholder="Share your experience with fit and durability..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger btn-sm w-100 fw-bold">Submit Review</button>
+            <div id="reviewSuccess" class="alert alert-success small py-1 mt-2 text-center" style="display: none;">Thank you! Your review has been submitted.</div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Reviews List -->
+      <div class="col-12 col-md-7">
+        <h5 class="fw-bold text-dark mb-3">Recent Reviews (<%= reviews.length %>)</h5>
+        <% if (reviews && reviews.length) { %>
+          <div class="list-group list-group-flush">
+            <% reviews.forEach(r => { %>
+              <div class="list-group-item px-0 py-3 border-bottom">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold small text-dark"><%= r.name %></span>
+                    <% if (r.isVerifiedBuyer) { %>
+                      <span class="badge bg-success bg-opacity-10 text-success" style="font-size: 10px;">Verified Buyer</span>
+                    <% } %>
+                  </div>
+                  <div class="text-warning small">
+                    <% for (let i = 1; i <= 5; i++) { %>
+                      <i class="fa-solid fa-star <%= i <= r.rating ? '' : 'text-muted text-opacity-25' %>"></i>
+                    <% } %>
+                  </div>
+                </div>
+                <% if (r.title) { %><h6 class="small fw-bold text-dark mb-1"><%= r.title %></h6><% } %>
+                <p class="small text-secondary mb-1"><%= r.comment %></p>
+                <small class="text-muted" style="font-size: 11px;"><%= r.createdAt.toLocaleDateString('en-GB') %></small>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="text-center py-5 text-muted small bg-light rounded-3">
+            <i class="fa-regular fa-comment-dots fs-3 mb-2 d-block"></i>
+            No reviews yet. Be the first to share your thoughts on this pair!
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- "You May Also Like" Related Products Carousel -->
+  <% if (relatedProducts && relatedProducts.length) { %>
+    <section class="border-top pt-5 mb-5">
+      <h4 class="fw-bold text-dark mb-4">You May Also Like</h4>
+      <div class="row g-3 g-md-4">
+        <% relatedProducts.slice(0, 4).forEach(p => { %>
+          <div class="col-6 col-md-3">
+            <%- include('../partials/product-card', { p }) %>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+</div>
+
+<!-- JSON-LD Product Schema for Google Rich Snippets -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "<%= product.name %>",
+  "image": "<%= product.primaryImage %>",
+  "description": "<%= (product.shortDesc || product.name).replace(/"/g, '') %>",
+  "brand": {
+    "@type": "Brand",
+    "name": "<%= product.brand ? product.brand.name : 'StepUp' %>"
+  },
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "BDT",
+    "price": "<%= product.isOnSale ? product.salePrice : product.price %>",
+    "availability": "<%= product.totalStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' %>",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
+</script>
+
+<script>
+  // Product PDP Variant Engine
+  const productData = <%- JSON.stringify(product) %>;
+  let currentColorIdx = 0;
+  let selectedSizeVariant = null;
+
+  function renderSizesForCurrentColor() {
+    const color = productData.colors[currentColorIdx];
+    const container = document.getElementById('sizeChipsContainer');
+    const stockText = document.getElementById('stockStatusText');
+    container.innerHTML = '';
+
+    if (!color || !color.sizes || !color.sizes.length) {
+      container.innerHTML = '<span class="text-muted small">Standard size</span>';
+      selectedSizeVariant = { size: 'Standard', stock: 10 };
+      return;
+    }
+
+    selectedSizeVariant = color.sizes.find(s => s.stock > 0) || color.sizes[0];
+
+    color.sizes.forEach((s, idx) => {
+      const isOut = s.stock <= 0;
+      const isSelected = selectedSizeVariant && selectedSizeVariant.size === s.size;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `btn btn-sm border rounded px-3 py-2 fw-medium ${isSelected ? 'btn-danger text-white' : 'btn-light text-dark'} ${isOut ? 'opacity-50 text-decoration-line-through' : ''}`;
+      btn.style.minWidth = '44px';
+      btn.innerText = s.size;
+      if (isOut) btn.disabled = true;
+
+      btn.addEventListener('click', () => {
+        selectedSizeVariant = s;
+        document.querySelectorAll('#sizeChipsContainer button').forEach(b => {
+          b.classList.remove('btn-danger', 'text-white');
+          b.classList.add('btn-light', 'text-dark');
+        });
+        btn.classList.add('btn-danger', 'text-white');
+        btn.classList.remove('btn-light', 'text-dark');
+        updateStockDisplay();
+      });
+
+      container.appendChild(btn);
+    });
+
+    updateStockDisplay();
+  }
+
+  function updateStockDisplay() {
+    const stockText = document.getElementById('stockStatusText');
+    const skuDisplay = document.getElementById('currentSkuDisplay');
+    if (selectedSizeVariant) {
+      if (selectedSizeVariant.stock > 0 && selectedSizeVariant.stock <= 5) {
+        stockText.innerHTML = `<span class="text-danger fw-semibold"><i class="fa-solid fa-fire me-1"></i>Hurry! Only ${selectedSizeVariant.stock} pair(s) remaining in this size.</span>`;
+      } else if (selectedSizeVariant.stock > 5) {
+        stockText.innerHTML = `<span class="text-success"><i class="fa-solid fa-check me-1"></i>In Stock (Ready to dispatch)</span>`;
+      } else {
+        stockText.innerHTML = `<span class="text-danger">Out of stock</span>`;
+      }
+      if (skuDisplay) skuDisplay.innerText = selectedSizeVariant.sku || productData.slug;
+    }
+  }
+
+  function selectColorVariant(idx, btn) {
+    currentColorIdx = idx;
+    document.querySelectorAll('.color-swatch-btn').forEach(b => {
+      b.classList.remove('border-danger', 'border-2', 'fw-bold');
+      b.classList.add('btn-light');
+    });
+    btn.classList.add('border-danger', 'border-2', 'fw-bold');
+    btn.classList.remove('btn-light');
+
+    const color = productData.colors[idx];
+    document.getElementById('selectedColorName').innerText = color.name;
+
+    // Switch gallery image to this color's primary image
+    if (color.images && color.images.length) {
+      document.getElementById('mainDisplayImg').src = color.images[0].url;
+    }
+
+    renderSizesForCurrentColor();
+  }
+
+  function switchGalleryMedia(url, type, thumbEl) {
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('border-danger', 'shadow-sm'));
+    thumbEl.classList.add('border-danger', 'shadow-sm');
+
+    const imgEl = document.getElementById('mainDisplayImg');
+    const vidEl = document.getElementById('mainDisplayVideo');
+
+    if (type === 'video') {
+      imgEl.style.display = 'none';
+      vidEl.style.display = 'block';
+      vidEl.src = url;
+      vidEl.play();
+    } else {
+      vidEl.style.display = 'none';
+      if (vidEl.src) vidEl.pause();
+      imgEl.style.display = 'block';
+      imgEl.src = url;
+    }
+  }
+
+  // Quantity Stepper
+  function incrementQty() {
+    const inp = document.getElementById('purchaseQty');
+    inp.value = Math.min(10, parseInt(inp.value || 1, 10) + 1);
+  }
+  function decrementQty() {
+    const inp = document.getElementById('purchaseQty');
+    inp.value = Math.max(1, parseInt(inp.value || 1, 10) - 1);
+  }
+
+  // Add to Cart from PDP
+  document.getElementById('pdpAddToCartBtn').addEventListener('click', () => {
+    if (!selectedSizeVariant || selectedSizeVariant.stock <= 0) {
+      alert('Please select an in-stock size.');
+      return;
+    }
+    const color = productData.colors[currentColorIdx];
+    const qty = parseInt(document.getElementById('purchaseQty').value, 10) || 1;
+    const price = productData.isOnSale ? productData.salePrice : productData.price;
+
+    addToCart({
+      productId: productData._id,
+      name: productData.name,
+      image: (color.images && color.images.length) ? color.images[0].url : productData.primaryImage,
+      price,
+      color: color.name,
+      size: selectedSizeVariant.size,
+      qty
+    });
+  });
+
+  // Buy Now (Adds to cart and immediately redirects to checkout)
+  document.getElementById('pdpBuyNowBtn').addEventListener('click', () => {
+    if (!selectedSizeVariant || selectedSizeVariant.stock <= 0) {
+      alert('Please select an in-stock size.');
+      return;
+    }
+    const color = productData.colors[currentColorIdx];
+    const qty = parseInt(document.getElementById('purchaseQty').value, 10) || 1;
+    const price = productData.isOnSale ? productData.salePrice : productData.price;
+
+    addToCart({
+      productId: productData._id,
+      name: productData.name,
+      image: (color.images && color.images.length) ? color.images[0].url : productData.primaryImage,
+      price,
+      color: color.name,
+      size: selectedSizeVariant.size,
+      qty
+    });
+
+    window.location.href = '/checkout';
+  });
+
+  // Review submission form AJAX
+  const revForm = document.getElementById('pdpReviewForm');
+  if (revForm) {
+    revForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(revForm);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const resData = await res.json();
+        if (resData.success) {
+          document.getElementById('reviewSuccess').style.display = 'block';
+          revForm.reset();
+        }
+      } catch (err) {
+        console.error('Review submit failed', err);
+      }
+    });
+  }
+
+  // Initial PDP setup
+  renderSizesForCurrentColor();
+</script>

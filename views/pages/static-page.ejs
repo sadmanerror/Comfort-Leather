@@ -1,0 +1,68 @@
+<div class="container py-4 py-lg-5">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb tw-text-sm tw-mb-0">
+      <li class="breadcrumb-item"><a href="/" class="tw-text-neutral-500 hover:tw-text-primary-600">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= page.title %></li>
+    </ol>
+  </nav>
+
+  <div class="row g-4 lg:g-5">
+    <!-- Sidebar: Policy & Information Links -->
+    <div class="col-lg-3">
+      <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-3 sticky-top" style="top: 90px;">
+        <span class="tw-text-2xs tw-uppercase tw-font-bold tw-text-neutral-400 px-3 py-2 d-block">Information & Help</span>
+        <div class="nav flex-column nav-pills tw-gap-1">
+          <a class="nav-link tw-rounded-xl tw-text-xs tw-font-medium <%= page.slug === 'about-us' ? 'active' : 'tw-text-neutral-700' %>" href="/pages/about-us">
+            <i class="bi bi-info-circle me-2"></i> About StepUp
+          </a>
+          <a class="nav-link tw-rounded-xl tw-text-xs tw-font-medium <%= page.slug === 'returns-exchanges' ? 'active' : 'tw-text-neutral-700' %>" href="/pages/returns-exchanges">
+            <i class="bi bi-arrow-repeat me-2"></i> 7-Day Exchange Policy
+          </a>
+          <a class="nav-link tw-rounded-xl tw-text-xs tw-font-medium <%= page.slug === 'shipping-delivery' ? 'active' : 'tw-text-neutral-700' %>" href="/pages/shipping-delivery">
+            <i class="bi bi-truck me-2"></i> Shipping & Delivery
+          </a>
+          <a class="nav-link tw-rounded-xl tw-text-xs tw-font-medium <%= page.slug === 'size-guide' ? 'active' : 'tw-text-neutral-700' %>" href="/pages/size-guide">
+            <i class="bi bi-rulers me-2"></i> Footwear Size Guide
+          </a>
+          <a class="nav-link tw-rounded-xl tw-text-xs tw-font-medium <%= page.slug === 'contact-us' ? 'active' : 'tw-text-neutral-700' %>" href="/pages/contact-us">
+            <i class="bi bi-headset me-2"></i> Contact Customer Care
+          </a>
+          <a class="nav-link tw-rounded-xl tw-text-xs tw-font-medium <%= page.slug === 'privacy-policy' ? 'active' : 'tw-text-neutral-700' %>" href="/pages/privacy-policy">
+            <i class="bi bi-shield-check me-2"></i> Privacy Policy
+          </a>
+          <a class="nav-link tw-rounded-xl tw-text-xs tw-font-medium <%= page.slug === 'terms-conditions' ? 'active' : 'tw-text-neutral-700' %>" href="/pages/terms-conditions">
+            <i class="bi bi-file-text me-2"></i> Terms & Conditions
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-lg-9">
+      <div class="card tw-border-neutral-200 tw-rounded-3xl tw-shadow-sm p-4 p-md-5">
+        <h1 class="tw-font-display tw-font-extrabold tw-text-2xl md:tw-text-3xl tw-text-neutral-900 mb-2">
+          <%= page.title %>
+        </h1>
+        <div class="tw-text-xs tw-text-neutral-400 mb-4 pb-3 border-bottom">
+          Last revised: <%= new Date(page.updatedAt || Date.now()).toLocaleDateString('en-BD', { month: 'long', day: 'numeric', year: 'numeric' }) %>
+        </div>
+
+        <div class="static-content tw-text-neutral-700 tw-leading-relaxed tw-space-y-4">
+          <%- page.content %>
+        </div>
+
+        <!-- Help Support Box -->
+        <div class="tw-bg-neutral-50 tw-border tw-border-neutral-200 tw-rounded-2xl p-4 mt-5 d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h4 class="tw-font-bold tw-text-sm tw-text-neutral-900 mb-1">Still have questions?</h4>
+            <p class="tw-text-xs tw-text-neutral-500 mb-0">Our Dhaka-based customer support team is available 7 days a week (9 AM - 10 PM).</p>
+          </div>
+          <a href="/pages/contact-us" class="btn btn-outline-dark btn-sm tw-rounded-xl px-3">
+            Contact Support
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

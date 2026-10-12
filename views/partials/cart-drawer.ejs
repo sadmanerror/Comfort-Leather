@@ -1,0 +1,47 @@
+<!-- Cart Drawer (Section 9 Offcanvas) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="cartDrawer" aria-labelledby="cartDrawerLabel" style="width: 380px;">
+  <div class="offcanvas-header border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-bag-shopping text-danger fs-5"></i>
+      <h5 class="offcanvas-title fw-bold text-dark m-0" id="cartDrawerLabel">Shopping Cart</h5>
+      <span class="badge bg-danger rounded-pill ms-1" id="cartDrawerCount">0</span>
+    </div>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+
+  <!-- Cart Drawer Body -->
+  <div class="offcanvas-body d-flex flex-column p-0">
+    <!-- Items List Container -->
+    <div class="flex-grow-1 overflow-y-auto p-3" id="cartDrawerItems">
+      <!-- Populated via JavaScript -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="cartDrawerEmpty" class="text-center p-5 my-auto" style="display: none;">
+      <i class="fa-solid fa-cart-shopping text-muted opacity-25" style="font-size: 64px;"></i>
+      <h5 class="fw-bold mt-3 mb-1 text-dark">Your cart is currently empty</h5>
+      <p class="text-muted small mb-4">Discover our handcrafted leather shoes and stylish sneakers.</p>
+      <a href="/collections/all" class="btn btn-danger btn-sm px-4 fw-semibold" data-bs-dismiss="offcanvas">
+        Continue Shopping
+      </a>
+    </div>
+
+    <!-- Cart Footer & Checkout Button -->
+    <div class="p-3 bg-light border-top" id="cartDrawerFooter">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-secondary small fw-medium">Subtotal</span>
+        <span class="fw-bold fs-5 text-dark" id="cartDrawerSubtotal">Tk 0.00</span>
+      </div>
+      <small class="text-muted d-block mb-3" style="font-size: 11px;">Shipping &amp; discounts calculated at checkout.</small>
+      
+      <div class="d-grid gap-2">
+        <a href="/checkout" class="btn btn-danger fw-bold py-2 tw-shadow-sm">
+          Check Out Now <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+        <a href="/cart" class="btn btn-outline-dark btn-sm py-2 fw-medium">
+          View Shopping Bag
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

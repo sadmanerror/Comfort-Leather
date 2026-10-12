@@ -1,0 +1,180 @@
+<div class="container py-4 py-lg-5">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb tw-text-sm tw-mb-0">
+      <li class="breadcrumb-item"><a href="/" class="tw-text-neutral-500 hover:tw-text-primary-600">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Track Order</li>
+    </ol>
+  </nav>
+
+  <div class="tw-max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <div class="tw-w-16 tw-h-16 tw-rounded-2xl tw-bg-primary-50 tw-text-primary-600 d-inline-flex align-items-center justify-content-center mb-3">
+        <i class="bi bi-geo-alt-fill tw-text-3xl"></i>
+      </div>
+      <h1 class="tw-font-display tw-font-extrabold tw-text-2xl md:tw-text-3xl tw-text-neutral-900 mb-2">Track Your Delivery</h1>
+      <p class="tw-text-neutral-500 tw-text-sm md:tw-text-base">
+        Enter your Order Reference number and phone number below to get live tracking updates.
+      </p>
+    </div>
+
+    <!-- Tracking Search Form -->
+    <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-4 p-md-5 mb-5">
+      <form action="/track-order" method="GET">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">ORDER NUMBER</label>
+            <input type="text" name="orderNo" class="form-control tw-rounded-xl text-uppercase" placeholder="e.g. STEP-2026-0001" value="<%= orderNo %>" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label tw-text-xs tw-font-semibold tw-text-neutral-700">PHONE NUMBER (11 DIGITS)</label>
+            <input type="tel" name="phone" class="form-control tw-rounded-xl" placeholder="e.g. 01712345678" value="<%= phone %>" required>
+          </div>
+          <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg w-100 tw-rounded-xl tw-font-bold">
+              <i class="bi bi-search me-2"></i> Track Parcel
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <% if (searched && !order) { %>
+      <!-- Not Found Alert -->
+      <div class="alert alert-warning tw-rounded-2xl p-4 text-center">
+        <i class="bi bi-exclamation-triangle-fill tw-text-2xl text-warning d-block mb-2"></i>
+        <h3 class="tw-font-bold tw-text-base mb-1">No Matching Order Found</h3>
+        <p class="tw-text-xs text-neutral-600 mb-0">
+          We couldn't locate an order matching Order No. <strong>"<%= orderNo %>"</strong> with phone <strong>"<%= phone %>"</strong>. Please check your SMS or email confirmation and try again.
+        </p>
+      </div>
+    <% } %>
+
+    <% if (order) { %>
+      <!-- Order Tracking Details -->
+      <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm overflow-hidden mb-4">
+        <!-- Order Header -->
+        <div class="card-header bg-white p-4 tw-border-b tw-border-neutral-200 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <span class="tw-text-xs tw-text-neutral-500 d-block">Order Reference</span>
+            <strong class="tw-font-mono tw-text-primary-700 tw-text-lg">#<%= order.orderNo %></strong>
+          </div>
+          <div class="text-end">
+            <span class="badge <%= order.status === 'Delivered' ? 'bg-success' : (order.status === 'Cancelled' ? 'bg-danger' : 'bg-primary') %> py-2 px-3 tw-rounded-lg tw-font-semibold">
+              Current Status: <%= order.status %>
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <% 
+            const steps = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+            let currentStepIdx = steps.indexOf(order.status);
+            if (currentStepIdx === -1) {
+              if (order.status === 'Cancelled') currentStepIdx = -1;
+              else currentStepIdx = 1;
+            }
+          %>
+
+          <% if (order.status !== 'Cancelled') { %>
+            <!-- 4-Stage Stepper -->
+            <div class="d-flex justify-content-between position-relative mb-5 px-2">
+              <!-- Stepper Line -->
+              <div class="position-absolute top-50 start-0 translate-middle-y w-100 tw-h-1 tw-bg-neutral-200" style="z-index: 1;"></div>
+              <div class="position-absolute top-50 start-0 translate-middle-y tw-h-1 tw-bg-primary-600" style="z-index: 1; width: <%= Math.max(0, currentStepIdx / 3 * 100) %>%;"></div>
+
+              <!-- Steps -->
+              <% steps.forEach((stepName, sIdx) => { 
+                const isPassed = sIdx <= currentStepIdx;
+                const isCurrent = sIdx === currentStepIdx;
+              %>
+                <div class="text-center position-relative" style="z-index: 2;">
+                  <div class="tw-w-10 tw-h-10 tw-rounded-full <%= isPassed ? 'tw-bg-primary-600 tw-text-white' : 'tw-bg-neutral-200 tw-text-neutral-500' %> d-flex align-items-center justify-content-center mx-auto mb-2 tw-shadow-sm">
+                    <% if (isPassed) { %>
+                      <i class="bi bi-check-lg tw-text-lg"></i>
+                    <% } else { %>
+                      <span class="tw-text-xs tw-font-bold"><%= sIdx + 1 %></span>
+                    <% } %>
+                  </div>
+                  <span class="tw-text-xs tw-font-bold <%= isCurrent ? 'tw-text-primary-700' : (isPassed ? 'tw-text-neutral-900' : 'tw-text-neutral-400') %> d-block">
+                    <%= stepName %>
+                  </span>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="alert alert-danger tw-rounded-xl text-center mb-4">
+              <i class="bi bi-x-circle-fill me-1"></i> This order was cancelled. Please contact customer care at +880 9612-345678 for assistance.
+            </div>
+          <% } %>
+
+          <!-- Delivery Details -->
+          <div class="row g-4 pt-3 border-top">
+            <div class="col-md-6">
+              <h4 class="tw-font-bold tw-text-xs tw-uppercase tw-text-neutral-500 mb-2">Delivery Address</h4>
+              <p class="tw-text-sm text-neutral-800 mb-0">
+                <strong><%= order.address.fullName %></strong><br>
+                <%= order.address.addressDetails %><br>
+                <%= order.address.area %>, <%= order.address.district %>, <%= order.address.division %>
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h4 class="tw-font-bold tw-text-xs tw-uppercase tw-text-neutral-500 mb-2">Courier Partner</h4>
+              <p class="tw-text-sm text-neutral-800 mb-0">
+                <% if (order.trackingNumber) { %>
+                  <strong>Carrier:</strong> <%= order.carrier || 'Pathao Express' %><br>
+                  <strong>Courier Tracking:</strong> <span class="tw-font-mono text-primary font-bold"><%= order.trackingNumber %></span>
+                <% } else { %>
+                  <span class="text-neutral-500">Assigned upon shipment (Pathao / Steadfast / In-house rider)</span>
+                <% } %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Items Ordered -->
+          <div class="mt-4 pt-3 border-top">
+            <h4 class="tw-font-bold tw-text-xs tw-uppercase tw-text-neutral-500 mb-3">Parcel Contents (<%= order.items.length %> items)</h4>
+            <div class="tw-space-y-2">
+              <% order.items.forEach(item => { %>
+                <div class="d-flex align-items-center justify-content-between p-2 tw-bg-neutral-50 tw-rounded-xl">
+                  <div class="d-flex align-items-center gap-3">
+                    <img src="<%= item.image || '/img/placeholder-shoe.svg' %>" alt="<%= item.name %>" class="tw-w-10 tw-h-10 tw-rounded-lg tw-object-cover flex-shrink-0">
+                    <div>
+                      <span class="tw-text-xs tw-font-semibold tw-text-neutral-900 line-clamp-1"><%= item.name %></span>
+                      <span class="tw-text-xs tw-text-neutral-500">Size: <%= item.size %> | Qty: <%= item.qty %></span>
+                    </div>
+                  </div>
+                  <span class="tw-text-xs tw-font-bold text-neutral-900">
+                    <%= formatBDT(item.price * item.qty) %>
+                  </span>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Status History Timeline -->
+          <% if (order.statusHistory && order.statusHistory.length) { %>
+            <div class="mt-4 pt-3 border-top">
+              <h4 class="tw-font-bold tw-text-xs tw-uppercase tw-text-neutral-500 mb-3">Status Timeline</h4>
+              <ul class="timeline tw-list-none ps-0 mb-0 tw-space-y-3">
+                <% order.statusHistory.forEach(history => { %>
+                  <li class="d-flex gap-3 align-items-start">
+                    <div class="tw-w-2 tw-h-2 tw-rounded-full tw-bg-primary-600 mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <div class="tw-text-xs tw-font-bold tw-text-neutral-900"><%= history.status %></div>
+                      <div class="tw-text-xs text-neutral-500"><%= new Date(history.changedAt).toLocaleString('en-BD') %></div>
+                      <% if (history.note) { %>
+                        <div class="tw-text-xs text-neutral-600 mt-0.5"><%= history.note %></div>
+                      <% } %>
+                    </div>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>

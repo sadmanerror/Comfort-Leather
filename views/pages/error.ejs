@@ -1,0 +1,38 @@
+<div class="container py-5 my-md-5 text-center">
+  <div class="tw-max-w-md mx-auto">
+    <div class="tw-w-24 tw-h-24 tw-rounded-3xl tw-bg-primary-50 tw-text-primary-600 d-inline-flex align-items-center justify-content-center mb-4 tw-shadow-sm">
+      <i class="bi bi-question-circle tw-text-5xl"></i>
+    </div>
+    
+    <div class="tw-font-mono tw-font-bold tw-text-primary-600 tw-text-sm mb-1">
+      ERROR <%= typeof statusCode !== 'undefined' ? statusCode : 404 %>
+    </div>
+
+    <h1 class="tw-font-display tw-font-extrabold tw-text-2xl md:tw-text-3xl tw-text-neutral-900 mb-3">
+      <%= typeof title !== 'undefined' ? title : 'Page Not Found' %>
+    </h1>
+
+    <p class="tw-text-neutral-500 tw-text-sm md:tw-text-base mb-4">
+      <%= typeof message !== 'undefined' ? message : 'The page you were looking for could not be located or may have moved to a different aisle.' %>
+    </p>
+
+    <!-- Quick Search -->
+    <div class="card tw-border-neutral-200 tw-rounded-2xl tw-shadow-sm p-3 mb-4">
+      <form action="/search" method="GET">
+        <div class="input-group">
+          <input type="text" name="q" class="form-control border-end-0" placeholder="Search shoes, sneakers, sandals...">
+          <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3">
+      <a href="/" class="btn btn-dark tw-rounded-xl px-4 py-2">
+        <i class="bi bi-house me-1"></i> Return Home
+      </a>
+      <a href="/collections/all" class="btn btn-outline-dark tw-rounded-xl px-4 py-2">
+        Explore Footwear
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,546 @@
+<!-- Add/Edit Product Form View -->
+<div class="container-fluid p-0">
+  <form id="productForm" action="<%= isEdit ? '/admin/products/' + product._id : '/admin/products' %>" method="POST" enctype="multipart/form-data">
+    <!-- Sticky Top Action Bar -->
+    <div class="card border-0 shadow-sm rounded-3 p-3 bg-white mb-4 position-sticky top-0 z-3">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <a href="/admin/products" class="btn btn-sm btn-light border text-secondary"><i class="fa-solid fa-arrow-left"></i></a>
+          <h4 class="fw-bold text-dark m-0"><%= isEdit ? 'Edit: ' + product.name : 'Create New Footwear / Product' %></h4>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <select name="status" class="form-select form-select-sm" style="width: 140px;">
+            <option value="Published" <%= product.status === 'Published' ? 'selected' : '' %>>Published</option>
+            <option value="Draft" <%= product.status === 'Draft' ? 'selected' : '' %>>Draft</option>
+          </select>
+          <button type="submit" name="action" value="save" class="btn btn-danger btn-sm px-3 fw-semibold">
+            <i class="fa-solid fa-floppy-disk me-1"></i> Save Product
+          </button>
+          <button type="submit" name="action" value="save_and_add" class="btn btn-outline-dark btn-sm px-3 d-none d-md-inline-block">
+            Save &amp; Add Another
+          </button>
+          <% if (isEdit) { %>
+            <a href="/products/<%= product.slug %>" target="_blank" class="btn btn-outline-secondary btn-sm px-2" title="View on Live Store">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Left Column (Main details & variants) -->
+      <div class="col-12 col-xl-8">
+        <!-- 1. Basic Information -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-info-circle text-danger me-2"></i>1. Basic Information</h5>
+          
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">Product Title <span class="text-danger">*</span></label>
+            <input type="text" name="name" id="productNameInput" class="form-control" placeholder="e.g. Comfort Leather Oxford Derby Shoe" value="<%= product.name %>" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">URL Slug <span class="text-danger">*</span></label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light text-muted">/products/</span>
+              <input type="text" name="slug" id="productSlugInput" class="form-control" placeholder="auto-generated-slug" value="<%= product.slug %>" required>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Brand <span class="text-danger">*</span></label>
+              <select name="brand" class="form-select" required>
+                <option value="">Choose Brand...</option>
+                <% brands.forEach(b => { %>
+                  <option value="<%= b._id %>" <%= (product.brand && (product.brand._id || product.brand).toString() == b._id.toString()) ? 'selected' : '' %>>
+                    <%= b.name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Target Gender <span class="text-danger">*</span></label>
+              <select name="gender" id="genderSelect" class="form-select" required>
+                <option value="Men" <%= product.gender === 'Men' ? 'selected' : '' %>>Men</option>
+                <option value="Women" <%= product.gender === 'Women' ? 'selected' : '' %>>Women</option>
+                <option value="Boys" <%= product.gender === 'Boys' ? 'selected' : '' %>>Boys</option>
+                <option value="Girls" <%= product.gender === 'Girls' ? 'selected' : '' %>>Girls</option>
+                <option value="Unisex" <%= product.gender === 'Unisex' ? 'selected' : '' %>>Unisex</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Category <span class="text-danger">*</span></label>
+              <select name="category" class="form-select" required>
+                <option value="">Select Category...</option>
+                <% categories.forEach(c => { %>
+                  <option value="<%= c._id %>" <%= (product.category && (product.category._id || product.category).toString() == c._id.toString()) ? 'selected' : '' %>>
+                    <%= c.name %> (<%= c.gender %>)
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Sub-Category</label>
+              <select name="subCategory" class="form-select">
+                <option value="">None / Direct</option>
+                <% categories.filter(c => c.parent).forEach(c => { %>
+                  <option value="<%= c._id %>" <%= (product.subCategory && (product.subCategory._id || product.subCategory).toString() == c._id.toString()) ? 'selected' : '' %>>
+                    <%= c.name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">Short Summary Description</label>
+            <textarea name="shortDesc" rows="2" class="form-control" placeholder="1-2 sentences highlighting key leather grade and fit..."><%= product.shortDesc || '' %></textarea>
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label small fw-semibold text-secondary">Full Detailed Description (HTML / Rich Text)</label>
+            <textarea name="description" rows="5" class="form-control" placeholder="Comprehensive product breakdown..."><%= product.description || '' %></textarea>
+          </div>
+        </div>
+
+        <!-- 2. Pricing & Discount Matrix -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-tags text-danger me-2"></i>2. Pricing &amp; Live Calculator</h5>
+          
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Regular Price (BDT) <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">Tk</span>
+                <input type="number" name="price" id="regularPriceInput" class="form-control" placeholder="4990" value="<%= product.price %>" required min="0">
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Sale Price (Optional)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">Tk</span>
+                <input type="number" name="salePrice" id="salePriceInput" class="form-control" placeholder="3990" value="<%= product.salePrice || '' %>" min="0">
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label small fw-semibold text-secondary">Discount Percentage (%)</label>
+              <div class="input-group">
+                <input type="number" id="discountPercentInput" class="form-control" placeholder="20" min="0" max="99">
+                <span class="input-group-text bg-light">%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Price Badge Preview -->
+          <div class="p-3 rounded bg-light border d-flex align-items-center justify-content-between">
+            <div class="small text-secondary">Storefront Display Preview:</div>
+            <div id="priceDisplayPreview" class="d-flex align-items-center gap-2">
+              <span class="text-muted text-decoration-line-through small" id="previewOldPrice">Tk <%= product.price || '0.00' %></span>
+              <span class="fw-bold text-danger fs-5" id="previewSalePrice">Tk <%= product.salePrice || product.price || '0.00' %></span>
+              <span class="badge bg-danger" id="previewBadge" style="<%= product.salePrice ? '' : 'display:none;' %>">-20% SALE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Variants (Color + Size Matrix) -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold text-dark m-0"><i class="fa-solid fa-shapes text-danger me-2"></i>3. Color &amp; Size Matrix</h5>
+            <button type="button" class="btn btn-outline-danger btn-sm" id="addColorBtn">
+              <i class="fa-solid fa-plus me-1"></i> Add Another Color
+            </button>
+          </div>
+          <p class="text-muted small">Configure colors and available shoe sizes with stock counts per variant.</p>
+
+          <input type="hidden" name="colors" id="colorsJsonInput">
+
+          <!-- Dynamic Color Containers -->
+          <div id="colorsContainer">
+            <!-- Color rows injected via JS -->
+          </div>
+        </div>
+
+        <!-- 4. Media & Video Upload -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-photo-film text-danger me-2"></i>4. Media &amp; Product Video</h5>
+          
+          <div class="mb-4">
+            <label class="form-label small fw-semibold text-secondary">Upload Product Images (JPG, PNG, WEBP)</label>
+            <div class="border-2 border-dashed rounded-3 p-4 text-center bg-light" id="dropArea">
+              <i class="fa-solid fa-cloud-arrow-up text-muted fs-1 mb-2"></i>
+              <p class="mb-1 fw-semibold text-dark">Click to browse or drag &amp; drop product photos</p>
+              <small class="text-muted d-block mb-3">Supports batch upload. High-res images auto-optimized for mobile.</small>
+              <input type="file" id="imageFileInput" multiple accept="image/*" class="d-none">
+              <button type="button" class="btn btn-sm btn-dark px-3" onclick="document.getElementById('imageFileInput').click()">
+                Select Files
+              </button>
+            </div>
+            <!-- Uploaded Images Preview Strip -->
+            <div id="uploadedImagesStrip" class="d-flex flex-wrap gap-2 mt-3"></div>
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label small fw-semibold text-secondary">Product Video (Optional MP4 - max 15MB, 20s)</label>
+            <input type="file" name="files" accept="video/mp4,video/webm" class="form-control form-control-sm">
+            <% if (product.video && product.video.url) { %>
+              <div class="mt-2">
+                <video src="<%= product.video.url %>" controls class="rounded border" style="max-height: 120px;"></video>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column (Merchandising, Specs, SEO) -->
+      <div class="col-12 col-xl-4">
+        <!-- Merchandising Flags -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h6 class="fw-bold text-dark mb-3">Merchandising Badges</h6>
+          
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" name="bestSeller" id="flagBestSeller" <%= product.flags?.bestSeller ? 'checked' : '' %>>
+            <label class="form-check-label small fw-medium" for="flagBestSeller">Best Seller Carousel</label>
+          </div>
+
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" name="justLanded" id="flagJustLanded" <%= product.flags?.justLanded ? 'checked' : '' %>>
+            <label class="form-check-label small fw-medium" for="flagJustLanded">Just Landed (New Arrivals)</label>
+          </div>
+
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="featured" id="flagFeatured" <%= product.flags?.featured ? 'checked' : '' %>>
+            <label class="form-check-label small fw-medium" for="flagFeatured">Featured Showcase</label>
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label small fw-semibold text-secondary">Product Tags (comma-separated)</label>
+            <input type="text" name="tags" class="form-control form-control-sm" placeholder="e.g. Leather, Formal, Black, Office" value="<%= product.tags ? product.tags.join(', ') : '' %>">
+          </div>
+        </div>
+
+        <!-- Specifications -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h6 class="fw-bold text-dark mb-3">Specifications &amp; Care</h6>
+          
+          <div class="mb-2">
+            <label class="form-label small text-secondary">Upper Material</label>
+            <input type="text" name="material" class="form-control form-control-sm" placeholder="e.g. Full-Grain Cowhide Leather" value="<%= product.specs?.material || '' %>">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small text-secondary">Sole Material</label>
+            <input type="text" name="sole" class="form-control form-control-sm" placeholder="e.g. Welted Anti-Slip Rubber" value="<%= product.specs?.sole || '' %>">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small text-secondary">Closure Type</label>
+            <input type="text" name="closure" class="form-control form-control-sm" placeholder="e.g. Lace-Up / Slip-On" value="<%= product.specs?.closure || '' %>">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small text-secondary">Occasion</label>
+            <input type="text" name="occasion" class="form-control form-control-sm" placeholder="e.g. Formal, Smart Casual, Party" value="<%= product.specs?.occasion || '' %>">
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label small text-secondary">Care Instructions</label>
+            <input type="text" name="careInstructions" class="form-control form-control-sm" placeholder="e.g. Clean with damp cloth, apply neutral polish" value="<%= product.specs?.careInstructions || '' %>">
+          </div>
+        </div>
+
+        <!-- SEO Metadata -->
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+          <h6 class="fw-bold text-dark mb-3">Search Engine Optimization (SEO)</h6>
+          
+          <div class="mb-2">
+            <label class="form-label small text-secondary">Meta Title</label>
+            <input type="text" name="seoTitle" id="seoTitleInput" class="form-control form-control-sm" value="<%= product.seo?.title || '' %>" placeholder="Title for Google">
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label small text-secondary">Meta Description</label>
+            <textarea name="seoDescription" id="seoDescInput" rows="3" class="form-control form-control-sm" placeholder="Brief summary under 160 chars"><%= product.seo?.description || '' %></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Initial state from server
+  let colorsData = <%- JSON.stringify(product.colors || []) %>;
+  if (!colorsData.length) {
+    colorsData = [{
+      name: 'Black',
+      hex: '#000000',
+      images: [{ url: '/img/placeholder-shoe.svg', isPrimary: true }],
+      sizes: [
+        { size: '7', stock: 10, sku: '' },
+        { size: '8', stock: 10, sku: '' },
+        { size: '9', stock: 10, sku: '' },
+        { size: '10', stock: 10, sku: '' }
+      ]
+    }];
+  }
+
+  // Preset size suggestions per gender
+  const sizePresets = {
+    'Men': ['5', '6', '7', '8', '9', '10', '11'],
+    'Women': ['3', '4', '5', '6', '7'],
+    'Boys': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'],
+    'Girls': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'],
+    'Unisex': ['5', '6', '7', '8', '9', '10', '11', '12']
+  };
+
+  const colorsContainer = document.getElementById('colorsContainer');
+  const colorsJsonInput = document.getElementById('colorsJsonInput');
+
+  function renderColors() {
+    colorsContainer.innerHTML = '';
+    const gender = document.getElementById('genderSelect').value || 'Men';
+    const presets = sizePresets[gender] || sizePresets['Men'];
+
+    colorsData.forEach((color, colorIdx) => {
+      const colorCard = document.createElement('div');
+      colorCard.className = 'border rounded-3 p-3 mb-3 bg-light';
+
+      let sizeInputsHtml = presets.map(sz => {
+        const existing = color.sizes?.find(s => s.size === sz);
+        const stockVal = existing ? existing.stock : 0;
+        const checked = existing !== undefined;
+        return `
+          <div class="col-4 col-sm-3 col-md-2 text-center p-1">
+            <div class="border rounded p-1 bg-white">
+              <div class="fw-bold small text-secondary">Size ${sz}</div>
+              <input type="number" min="0" class="form-control form-control-sm text-center py-0 mt-1 size-stock-input" 
+                data-color="${colorIdx}" data-size="${sz}" value="${stockVal}">
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      colorCard.innerHTML = `
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <input type="color" class="form-control form-control-color border-0 p-0" value="${color.hex || '#000000'}" 
+              onchange="colorsData[${colorIdx}].hex = this.value">
+            <input type="text" class="form-control form-control-sm fw-semibold" style="width: 150px;" 
+              value="${color.name}" placeholder="Color Name" onchange="colorsData[${colorIdx}].name = this.value">
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0" onclick="applyStockToAll(${colorIdx})">
+              Apply Stock to All
+            </button>
+            ${colorsData.length > 1 ? `<button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="removeColor(${colorIdx})"><i class="fa-solid fa-trash"></i></button>` : ''}
+          </div>
+        </div>
+
+        <div class="small fw-semibold text-secondary mb-1">Sizes &amp; Stock Grid:</div>
+        <div class="row g-1">
+          ${sizeInputsHtml}
+        </div>
+      `;
+
+      colorsContainer.appendChild(colorCard);
+    });
+
+    // Attach listeners to stock inputs
+    document.querySelectorAll('.size-stock-input').forEach(inp => {
+      inp.addEventListener('input', (e) => {
+        const cIdx = parseInt(e.target.dataset.color, 10);
+        const sVal = e.target.dataset.size;
+        const st = parseInt(e.target.value || '0', 10);
+
+        let szObj = colorsData[cIdx].sizes.find(s => s.size === sVal);
+        if (szObj) {
+          szObj.stock = st;
+        } else {
+          colorsData[cIdx].sizes.push({ size: sVal, stock: st });
+        }
+      });
+    });
+
+    colorsJsonInput.value = JSON.stringify(colorsData);
+  }
+
+  function applyStockToAll(colorIdx) {
+    const val = prompt('Enter stock quantity to apply to all sizes for this color:', '10');
+    if (val !== null) {
+      const num = parseInt(val, 10) || 0;
+      const gender = document.getElementById('genderSelect').value || 'Men';
+      const presets = sizePresets[gender] || sizePresets['Men'];
+      colorsData[colorIdx].sizes = presets.map(sz => ({ size: sz, stock: num }));
+      renderColors();
+    }
+  }
+
+  function removeColor(idx) {
+    colorsData.splice(idx, 1);
+    renderColors();
+  }
+
+  document.getElementById('addColorBtn').addEventListener('click', () => {
+    colorsData.push({
+      name: 'New Color',
+      hex: '#333333',
+      images: [{ url: '/img/placeholder-shoe.svg', isPrimary: true }],
+      sizes: []
+    });
+    renderColors();
+  });
+
+  document.getElementById('genderSelect').addEventListener('change', renderColors);
+
+  // Sync JSON before submit
+  document.getElementById('productForm').addEventListener('submit', () => {
+    colorsJsonInput.value = JSON.stringify(colorsData);
+  });
+
+  // Price & Discount Live Calculator
+  const regPrice = document.getElementById('regularPriceInput');
+  const salePrice = document.getElementById('salePriceInput');
+  const discountPct = document.getElementById('discountPercentInput');
+  const previewOld = document.getElementById('previewOldPrice');
+  const previewSale = document.getElementById('previewSalePrice');
+  const previewBadge = document.getElementById('previewBadge');
+
+  function updatePricePreview() {
+    const p = parseFloat(regPrice.value) || 0;
+    const sp = parseFloat(salePrice.value) || 0;
+
+    previewOld.innerText = 'Tk ' + p.toLocaleString('en-BD', { minimumFractionDigits: 2 });
+    if (sp > 0 && sp < p) {
+      previewSale.innerText = 'Tk ' + sp.toLocaleString('en-BD', { minimumFractionDigits: 2 });
+      previewOld.style.display = 'inline';
+      const pct = Math.round(((p - sp) / p) * 100);
+      previewBadge.style.display = 'inline';
+      previewBadge.innerText = `-${pct}% SALE`;
+    } else {
+      previewSale.innerText = 'Tk ' + p.toLocaleString('en-BD', { minimumFractionDigits: 2 });
+      previewOld.style.display = 'none';
+      previewBadge.style.display = 'none';
+    }
+  }
+
+  regPrice.addEventListener('input', () => {
+    if (discountPct.value && regPrice.value) {
+      const p = parseFloat(regPrice.value);
+      const d = parseFloat(discountPct.value);
+      salePrice.value = Math.round(p * (1 - d / 100));
+    }
+    updatePricePreview();
+  });
+
+  salePrice.addEventListener('input', () => {
+    if (regPrice.value && salePrice.value) {
+      const p = parseFloat(regPrice.value);
+      const sp = parseFloat(salePrice.value);
+      if (sp < p) {
+        discountPct.value = Math.round(((p - sp) / p) * 100);
+      } else {
+        discountPct.value = '';
+      }
+    }
+    updatePricePreview();
+  });
+
+  discountPct.addEventListener('input', () => {
+    if (regPrice.value && discountPct.value) {
+      const p = parseFloat(regPrice.value);
+      const d = parseFloat(discountPct.value);
+      salePrice.value = Math.round(p * (1 - d / 100));
+    } else {
+      salePrice.value = '';
+    }
+    updatePricePreview();
+  });
+
+  // Auto-slug generation
+  const nameInput = document.getElementById('productNameInput');
+  const slugInput = document.getElementById('productSlugInput');
+  const seoTitleInput = document.getElementById('seoTitleInput');
+
+  nameInput.addEventListener('input', () => {
+    if (!slugInput.dataset.manual) {
+      slugInput.value = nameInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+    if (!seoTitleInput.value) {
+      seoTitleInput.value = nameInput.value + ' | Comfort Leather';
+    }
+  });
+
+  slugInput.addEventListener('input', () => {
+    slugInput.dataset.manual = 'true';
+  });
+
+  // Image upload handler
+  const imageInput = document.getElementById('imageFileInput');
+  const imagesStrip = document.getElementById('uploadedImagesStrip');
+
+  imageInput.addEventListener('change', async () => {
+    const files = imageInput.files;
+    for (let i = 0; i < files.length; i++) {
+      const formData = new FormData();
+      formData.append('file', files[i]);
+
+      try {
+        const res = await fetch('/admin/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          // Add to first color
+          if (colorsData.length) {
+            colorsData[0].images.push({
+              url: data.url,
+              publicId: data.publicId,
+              isPrimary: colorsData[0].images.length === 0,
+              isHover: colorsData[0].images.length === 1
+            });
+            renderImagesStrip();
+            renderColors();
+          }
+        }
+      } catch (e) {
+        console.error('Upload failed', e);
+      }
+    }
+  });
+
+  function renderImagesStrip() {
+    imagesStrip.innerHTML = '';
+    if (colorsData.length && colorsData[0].images) {
+      colorsData[0].images.forEach((img, idx) => {
+        const div = document.createElement('div');
+        div.className = 'position-relative border rounded p-1 bg-white';
+        div.innerHTML = `
+          <img src="${img.url}" width="60" height="60" class="object-fit-cover rounded">
+          <button type="button" class="btn btn-danger btn-sm p-0 position-absolute top-0 end-0 rounded-circle" 
+            style="width: 18px; height: 18px; font-size: 10px;" onclick="removeImage(${idx})">&times;</button>
+          <div class="small text-center" style="font-size: 10px;">${img.isPrimary ? 'Primary' : ''}</div>
+        `;
+        imagesStrip.appendChild(div);
+      });
+    }
+  }
+
+  function removeImage(idx) {
+    if (colorsData.length && colorsData[0].images) {
+      colorsData[0].images.splice(idx, 1);
+      renderImagesStrip();
+      renderColors();
+    }
+  }
+
+  // Initial render
+  renderColors();
+  updatePricePreview();
+  renderImagesStrip();
+</script>

@@ -1,0 +1,128 @@
+<!-- Mega Menu Component (Section 4.4) -->
+<nav class="d-none d-lg-flex align-items-center justify-content-center flex-grow-1">
+  <ul class="nav align-items-center gap-1 mb-0 list-unstyled">
+    <% if (megaMenu && megaMenu.length) { %>
+      <% megaMenu.forEach(item => { %>
+        <li class="nav-item <%= item.isMega || (item.columns && item.columns.length) ? 'nav-item-mega position-static' : 'position-relative' %>">
+          <a class="nav-link px-3 py-3 fw-bold text-dark text-uppercase d-flex align-items-center gap-1" 
+             style="font-size: 13.5px; letter-spacing: 0.5px;" 
+             href="<%= item.link %>">
+            <%= item.title %>
+            <% if (item.badge) { %>
+              <span class="badge rounded-pill text-white" style="background-color: <%= item.badgeColor || '#D6001C' %>; font-size: 9px; padding: 2px 6px;">
+                <%= item.badge %>
+              </span>
+            <% } %>
+            <% if (item.columns && item.columns.length) { %>
+              <i class="fa-solid fa-chevron-down text-muted" style="font-size: 10px;"></i>
+            <% } %>
+          </a>
+
+          <!-- Mega-Panel Dropdown -->
+          <% if (item.columns && item.columns.length) { %>
+            <div class="mega-menu-panel py-4 px-5">
+              <div class="container">
+                <div class="row g-4">
+                  <% item.columns.forEach(col => { %>
+                    <div class="col">
+                      <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 text-uppercase" style="font-size: 13px; letter-spacing: 0.5px;">
+                        <%= col.columnTitle %>
+                      </h6>
+                      <ul class="list-unstyled mb-0">
+                        <% (col.links || []).forEach(lnk => { %>
+                          <li class="mb-2">
+                            <a href="<%= lnk.url %>" class="text-secondary text-decoration-none small hover-danger <%= lnk.isHighlighted ? 'fw-bold text-danger' : '' %>">
+                              <%= lnk.label %>
+                            </a>
+                          </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+          <% } %>
+        </li>
+      <% }) %>
+    <% } else { %>
+      <!-- Fallback static menu if empty -->
+      <li class="nav-item"><a class="nav-link px-3 py-3 fw-bold text-dark text-uppercase small" href="/collections/discounted">DISCOUNTED</a></li>
+      <li class="nav-item"><a class="nav-link px-3 py-3 fw-bold text-dark text-uppercase small" href="/collections/sneakers">SNEAKER STUDIO</a></li>
+      <li class="nav-item"><a class="nav-link px-3 py-3 fw-bold text-dark text-uppercase small" href="/collections/men">MEN</a></li>
+      <li class="nav-item"><a class="nav-link px-3 py-3 fw-bold text-dark text-uppercase small" href="/collections/women">WOMEN</a></li>
+      <li class="nav-item"><a class="nav-link px-3 py-3 fw-bold text-dark text-uppercase small" href="/collections/kids">CHILDREN</a></li>
+      <li class="nav-item"><a class="nav-link px-3 py-3 fw-bold text-dark text-uppercase small" href="/collections/accessories">ACCESSORIES</a></li>
+    <% } %>
+  </ul>
+</nav>
+
+<!-- Mobile Navigation Offcanvas (Left) -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNavOffcanvas" aria-labelledby="mobileNavLabel" style="width: 320px;">
+  <div class="offcanvas-header border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <img src="<%= (settings && settings.logoUrl) || '/img/logo.svg' %>" alt="<%= (settings && settings.storeName) || 'Comfort Leather' %>" height="32">
+    </div>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <div class="accordion accordion-flush" id="mobileMenuAccordion">
+      <% if (megaMenu && megaMenu.length) { %>
+        <% megaMenu.forEach((item, idx) => { %>
+          <% if (item.columns && item.columns.length) { %>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold text-dark py-3" type="button" data-bs-toggle="collapse" data-bs-target="#mobCollapse<%= idx %>">
+                  <%= item.title %>
+                  <% if (item.badge) { %>
+                    <span class="badge ms-2" style="background-color: <%= item.badgeColor || '#D6001C' %>; font-size: 9px;"><%= item.badge %></span>
+                  <% } %>
+                </button>
+              </h2>
+              <div id="mobCollapse<%= idx %>" class="accordion-collapse collapse" data-bs-parent="#mobileMenuAccordion">
+                <div class="accordion-body bg-light py-2 px-3">
+                  <% item.columns.forEach(col => { %>
+                    <div class="mb-3">
+                      <div class="fw-semibold small text-secondary border-bottom pb-1 mb-2"><%= col.columnTitle %></div>
+                      <ul class="list-unstyled ps-2 mb-0">
+                        <% (col.links || []).forEach(lnk => { %>
+                          <li class="mb-2">
+                            <a href="<%= lnk.url %>" class="text-dark text-decoration-none small d-block">
+                              <%= lnk.label %>
+                            </a>
+                          </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="border-bottom p-3">
+              <a href="<%= item.link %>" class="fw-bold text-dark text-decoration-none d-block">
+                <%= item.title %>
+                <% if (item.badge) { %>
+                  <span class="badge ms-2" style="background-color: <%= item.badgeColor || '#D6001C' %>; font-size: 9px;"><%= item.badge %></span>
+                <% } %>
+              </a>
+            </div>
+          <% } %>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <!-- Mobile Account & Contact Links -->
+    <div class="p-3 bg-light border-top mt-3 small">
+      <a href="/stores" class="d-flex align-items-center gap-2 text-dark text-decoration-none mb-2">
+        <i class="fa-solid fa-location-dot text-danger"></i> Find A Store Outlet
+      </a>
+      <a href="/track-order" class="d-flex align-items-center gap-2 text-dark text-decoration-none mb-2">
+        <i class="fa-solid fa-truck-fast text-secondary"></i> Track Your Order
+      </a>
+      <a href="tel:<%= (settings && settings.contactPhone) || '09666200300' %>" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
+        <i class="fa-solid fa-phone text-success"></i> Customer Care: <%= (settings && settings.contactPhone) || '09666200300' %>
+      </a>
+    </div>
+  </div>
+</div>

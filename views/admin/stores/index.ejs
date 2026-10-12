@@ -1,0 +1,117 @@
+<!-- Store Locator Management -->
+<div class="container-fluid p-0">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h3 class="fw-bold text-dark m-0">Store Locator Outlets</h3>
+      <p class="text-muted small m-0">Manage retail brand outlets, phone numbers, operating hours, and Google Map locations</p>
+    </div>
+    <button class="btn btn-danger btn-sm px-3" data-bs-toggle="modal" data-bs-target="#storeModal" onclick="openAddStore()">
+      <i class="fa-solid fa-plus me-1"></i> Add Store Outlet
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 text-nowrap">
+        <thead class="table-light small text-secondary">
+          <tr>
+            <th class="ps-3">Outlet Name</th>
+            <th>City</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Operating Hours</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          <% if (stores && stores.length) { %>
+            <% stores.forEach(s => { %>
+              <tr>
+                <td class="ps-3 fw-bold text-dark"><%= s.name %></td>
+                <td><span class="badge bg-light text-dark border"><%= s.city %></span></td>
+                <td class="text-muted" style="max-width: 250px;"><%= s.address %></td>
+                <td><%= s.phone || '&mdash;' %></td>
+                <td><%= s.hours %></td>
+                <td>
+                  <span class="badge <%= s.isActive ? 'bg-success' : 'bg-secondary' %>">
+                    <%= s.isActive ? 'Open' : 'Closed' %>
+                  </span>
+                </td>
+                <td class="text-end pe-3">
+                  <form action="/admin/stores/<%= s._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this store outlet?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">No retail stores listed yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Store Modal -->
+<div class="modal fade" id="storeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="storeModalTitle">Add Store Outlet</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/stores" method="POST">
+        <input type="hidden" name="id" id="storeId">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Store / Outlet Name <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Comfort Leather Flagship Outlet - Gulshan" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">City / Division <span class="text-danger">*</span></label>
+            <input type="text" name="city" class="form-control" placeholder="e.g. Dhaka" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Physical Address <span class="text-danger">*</span></label>
+            <textarea name="address" rows="2" class="form-control" placeholder="House, Road, Area details" required></textarea>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Phone</label>
+              <input type="text" name="phone" class="form-control" placeholder="09666200300">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Operating Hours</label>
+              <input type="text" name="hours" class="form-control" value="10:00 AM - 9:00 PM">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Google Maps URL</label>
+            <input type="text" name="mapUrl" class="form-control" placeholder="https://maps.google.com/...">
+          </div>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" name="isActive" id="storeActive" checked>
+            <label class="form-check-label small fw-medium" for="storeActive">Is Open / Active</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger px-3">Save Store</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddStore() {
+    document.getElementById('storeId').value = '';
+    document.getElementById('storeModalTitle').innerText = 'Add Store Outlet';
+  }
+</script>

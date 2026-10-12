@@ -1,0 +1,57 @@
+<!-- Header Navbar (Section 4.2) -->
+<header class="bg-white border-bottom sticky-top shadow-sm z-3">
+  <div class="container d-flex align-items-center justify-content-between py-2 py-lg-0">
+    <!-- Left: Hamburger (Mobile) + Brand Logo -->
+    <div class="d-flex align-items-center gap-2">
+      <!-- Mobile Hamburger Button -->
+      <button class="btn btn-sm btn-light d-lg-none border-0 p-2 text-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNavOffcanvas">
+        <i class="fa-solid fa-bars fs-5"></i>
+      </button>
+
+      <!-- Brand Logo -->
+      <a href="/" class="d-flex align-items-center text-decoration-none py-2">
+        <img src="<%= (settings && settings.logoUrl) || '/img/logo.svg' %>" alt="<%= (settings && settings.storeName) || 'Comfort Leather' %>" height="42" class="d-inline-block">
+      </a>
+    </div>
+
+    <!-- Center: Desktop Mega-Menu -->
+    <%- include('mega-menu') %>
+
+    <!-- Right: Search, User Profile, Wishlist, Cart -->
+    <div class="d-flex align-items-center gap-3">
+      <!-- Search Trigger -->
+      <button type="button" class="btn btn-sm btn-light rounded-circle border-0 text-dark d-flex align-items-center justify-content-center"
+        onclick="openSearch()" style="width: 38px; height: 38px;" title="Search Catalog">
+        <i class="fa-solid fa-magnifying-glass fs-6"></i>
+      </button>
+
+      <!-- User Account Trigger -->
+      <% if (currentUser) { %>
+        <a href="/account" class="btn btn-sm btn-light rounded-circle border-0 text-dark d-flex align-items-center justify-content-center position-relative"
+          style="width: 38px; height: 38px;" title="My Account">
+          <i class="fa-solid fa-user fs-6"></i>
+          <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle"></span>
+        </a>
+      <% } else { %>
+        <button type="button" class="btn btn-sm btn-light rounded-circle border-0 text-dark d-flex align-items-center justify-content-center"
+          data-bs-toggle="modal" data-bs-target="#loginModal" style="width: 38px; height: 38px;" title="Sign In">
+          <i class="fa-regular fa-user fs-6"></i>
+        </button>
+      <% } %>
+
+      <!-- Wishlist Heart Trigger -->
+      <a href="/wishlist" class="btn btn-sm btn-light rounded-circle border-0 text-dark d-flex align-items-center justify-content-center position-relative"
+        style="width: 38px; height: 38px;" title="Wishlist">
+        <i class="fa-regular fa-heart fs-6 text-danger"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="headerWishlistBadge" style="font-size: 10px; display: none;">0</span>
+      </a>
+
+      <!-- Cart Drawer Trigger -->
+      <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 py-1 d-flex align-items-center gap-2 border-0 shadow-sm"
+        data-bs-toggle="offcanvas" data-bs-target="#cartDrawer" title="View Cart">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span class="fw-bold" id="headerCartCount" style="font-size: 13px;">0</span>
+      </button>
+    </div>
+  </div>
+</header>

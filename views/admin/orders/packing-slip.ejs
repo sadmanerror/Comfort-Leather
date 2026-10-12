@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Packing Slip #<%= order.orderNo %> - Comfort Leather</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #222; background: #fff; }
+    .slip-box { max-width: 800px; margin: auto; padding: 30px; }
+    @media print {
+      .no-print { display: none !important; }
+      .slip-box { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="slip-box">
+    <div class="no-print mb-3 text-end">
+      <button class="btn btn-dark btn-sm" onclick="window.print()">Print Packing Slip</button>
+    </div>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+      <div>
+        <h2 class="fw-bold m-0">CL FULFILLMENT</h2>
+        <small class="text-muted">Warehouse Dispatch &bull; Dhaka Central Hub</small>
+      </div>
+      <div class="text-end">
+        <h3 class="fw-bold m-0">PACKING SLIP</h3>
+        <p class="m-0 text-muted"><strong>#<%= order.orderNo %></strong></p>
+      </div>
+    </div>
+
+    <!-- Destination -->
+    <div class="card p-3 mb-4 bg-light border-0">
+      <h6 class="fw-bold text-uppercase small text-secondary mb-2">Shipment Destination:</h6>
+      <h5 class="fw-bold m-0"><%= order.address.fullName %></h5>
+      <p class="m-0 fw-semibold">Phone: <%= order.address.phone %></p>
+      <p class="m-0"><%= order.address.addressDetails %></p>
+      <p class="m-0"><%= order.address.area %>, <%= order.address.district %>, <%= order.address.division %></p>
+      <% if (order.note) { %>
+        <div class="mt-2 text-danger small fst-italic">
+          <strong>Special Delivery Note:</strong> <%= order.note %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Packing Checklist -->
+    <table class="table table-bordered mb-4">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 50px;" class="text-center">Check</th>
+          <th>Item &amp; Model</th>
+          <th>SKU</th>
+          <th>Color</th>
+          <th>Size</th>
+          <th class="text-center">Qty to Pack</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% order.items.forEach(item => { %>
+          <tr>
+            <td class="text-center align-middle">
+              <input type="checkbox" style="width: 18px; height: 18px;">
+            </td>
+            <td><strong><%= item.name %></strong></td>
+            <td><code><%= item.sku || 'N/A' %></code></td>
+            <td><%= item.color %></td>
+            <td><strong class="fs-6"><%= item.size %></strong></td>
+            <td class="text-center fs-6 fw-bold"><%= item.qty %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <div class="row mt-5 pt-4 border-top">
+      <div class="col-6">
+        <p class="small text-muted mb-4">Packed By: ___________________________</p>
+        <p class="small text-muted">Signature &amp; Date</p>
+      </div>
+      <div class="col-6 text-end">
+        <p class="small text-muted mb-4">Courier Handover: _____________________</p>
+        <p class="small text-muted">Courier Rider Signature</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
